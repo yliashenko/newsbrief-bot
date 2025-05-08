@@ -1,8 +1,10 @@
 import openai
+import os
 
 client = openai.OpenAI(
     base_url="https://api.groq.com/openai/v1",
-    api_key="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"
+    api_key=os.environ["GROQ_API_KEY"],
+    http_client=openai._http_client.SyncHttpxClientWrapper(),
 )
 
 async def summarize_texts(texts):
@@ -12,7 +14,7 @@ async def summarize_texts(texts):
     )
 
     response = client.chat.completions.create(
-        model="llama-3.3-70b-versatile",
+        model="mistral-saba-24b",
         messages=[
             {"role": "system", "content": "Ти аналітик новин. Формуй короткі дайджести."},
             {"role": "user", "content": prompt}
