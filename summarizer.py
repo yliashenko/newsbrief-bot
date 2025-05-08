@@ -2,7 +2,7 @@ import openai
 import os
 
 openai.api_key = os.environ["GROQ_API_KEY"]
-openai.base_url = "https://api.groq.com/openai/v1"
+openai.api_base = "https://api.groq.com/openai/v1"
 
 async def summarize_texts(texts):
     prompt = (
