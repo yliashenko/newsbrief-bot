@@ -3,8 +3,7 @@ import os
 
 client = openai.OpenAI(
     base_url="https://api.groq.com/openai/v1",
-    api_key=os.environ["GROQ_API_KEY"],
-    http_client=openai._http_client.SyncHttpxClientWrapper(),
+    api_key=os.environ["GROQ_API_KEY"]
 )
 
 async def summarize_texts(texts):
