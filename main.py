@@ -13,7 +13,7 @@ def build_bold_linked_title(title: str, channel_id: int, message_id: int) -> str
     if channel_id and message_id:
         chat_link = f"https://t.me/c/{channel_id}/{message_id}"
         return f"[{escaped_title}]({chat_link})"
-    return escaped_title
+    return f"{escaped_title}"
 
 async def main():
     bot = Bot(token=bot_token)
@@ -49,8 +49,9 @@ async def main():
                     emoji = "🤖" if "ai" in stream_name.lower() else "🧠"
 
                     title_link = build_bold_linked_title(title, channel_id, message_id)
+                    prefix = escape_markdown(f"{idx+1}.{emoji}")
 
-                    result += f"{idx+1}.{emoji} {title_link}:\n{escape_markdown(summary)}\n\n"
+                    result += f"{prefix} {title_link}:\n{escape_markdown(summary)}\n\n"
 
                 empty_stream = False
             except Exception as e:
