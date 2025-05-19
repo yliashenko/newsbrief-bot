@@ -15,20 +15,20 @@ channel_streams = {
         "@ppprompt"
     ],
     "intresting": [
-        "@@spekamedia",
-        "@@iSIGHTmedia",
+        "@spekamedia",
+        "@iSIGHTmedia",
         "@wallstreetukr"
         "@MichaelPatsan"
         "@theworldisnoteasy"
         "@keddr"
     ],
     "crypto": [
-        "@@crypto_rostik",
+        "@crypto_rostik",
         "@wvlad.crew",
     ],
     "politics": [
         "@OstanniyCapitalist"
         "@resurgammmm"
-        
+
     ]
 }

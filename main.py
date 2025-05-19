@@ -15,16 +15,26 @@ async def main():
         posts_by_channel = await get_channel_posts(channels=channels, limit=10)
 
         result = f"\U0001F4DA Зведення по темі: *{stream_name.upper()}*\n"
+        empty_stream = True
 
         for channel, posts in posts_by_channel.items():
             texts = [p.message for p in posts if hasattr(p, 'message') and p.message][:5]
+
+            if not texts:
+                result += f"\n⚠️ Неможливо отримати пости з {channel}\n"
+                continue
+
             try:
                 summary = await summarize_texts(texts)
                 result += f"\n\U0001F4CC *{channel}*:\n{summary.strip()}\n"
+                empty_stream = False
             except Exception as e:
-                result += f"\n⚠️ {channel}: Помилка при обробці — {e}\n"
+                result += f"\n⚠️ Помилка при обробці {channel}: {e}\n"
 
-            await asyncio.sleep(7)  # throttle for Groq rate limits
+            await asyncio.sleep(7)
+
+        if empty_stream:
+            result += "\n⚠️ У цьому потоці не вдалося сформувати жодного зведення.\n"
 
         escaped_result = escape_markdown(result)
         await bot.send_message(chat_id=chat_id, text=escaped_result[:4000], parse_mode="MarkdownV2")
