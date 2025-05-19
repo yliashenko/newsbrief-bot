@@ -6,7 +6,8 @@ from aiogram import Bot
 from config import bot_token, chat_id, channel_streams
 
 def escape_markdown(text):
-    return re.sub(r'([_\*\[\]\(\)~`>#+\-=|{}.!])', r'\\\1', text)
+    # Екрануємо лише обов'язкові символи MarkdownV2 (без крапки)
+    return re.sub(r'([_\*\[\]\(\)~`>#+=|{}!\-])', r'\\\1', text)
 
 def build_bold_linked_title(title: str, channel_id: int, message_id: int) -> str:
     escaped_title = escape_markdown(title)
@@ -50,15 +51,11 @@ async def main():
                     title = await generate_title(text)
                     summary = await summarize_texts([text])
 
-                    # Обрізати занадто довге summary
                     summary = summary.strip()
                     if len(summary) > 700:
                         summary = summary[:700].rsplit(".", 1)[0] + "."
 
-                    # Видалити зайві рядки типу "Зведення з Telegram"
                     summary = re.sub(r"(?i)^\*+Зведення з Telegram:?\*+", "", summary).strip()
-
-                    # Якщо summary у форматі маркованого списку — перетворити в абзац
                     summary = re.sub(r"\n\d+[\)\.\-]", ".", summary).strip()
                     summary = re.sub(r"\n+", " ", summary)
 
