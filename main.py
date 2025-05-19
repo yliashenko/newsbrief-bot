@@ -5,16 +5,20 @@ from summarizer import summarize_texts, generate_title
 from aiogram import Bot
 from config import bot_token, chat_id, channel_streams
 
-def escape_markdown(text):
-    # Екранує всі спецсимволи MarkdownV2, включно з крапкою
+def escape_markdown(text: str) -> str:
+    # Повне екранування для MarkdownV2
     return re.sub(r'([_\*\[\]\(\)~`>#+=|{}!\\\.\-])', r'\\\1', text)
 
+def escape_link_text(text: str) -> str:
+    # Обмежене екранування — не чіпає крапку й дужки
+    return re.sub(r'([_\*~`>#+=|{}!\\])', r'\\\1', text)
+
 def build_bold_linked_title(title: str, channel_id: int, message_id: int) -> str:
-    escaped_title = escape_markdown(title)
+    clean_title = escape_link_text(title)
     if channel_id and message_id:
         chat_link = f"https://t.me/c/{channel_id}/{message_id}"
-        return f"[{escaped_title}]({chat_link})"
-    return escaped_title
+        return f"[{clean_title}]({chat_link})"
+    return clean_title
 
 async def main():
     bot = Bot(token=bot_token)
