@@ -24,7 +24,6 @@ channel_streams = {
     ],
     "crypto": [
         "@crypto_rostik",
-        "@wvlad.crew",
     ],
     "politics": [
         "@OstanniyCapitalist",
