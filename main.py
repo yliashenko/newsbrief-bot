@@ -1,8 +1,12 @@
 import asyncio
+import re
 from telegram_client import get_channel_posts
 from summarizer import summarize_texts
 from aiogram import Bot
 from config import bot_token, chat_id, channel_streams
+
+def escape_markdown(text):
+    return re.sub(r'([_\*\[\]\(\)~`>#+\-=|{}.!])', r'\\\1', text)
 
 async def main():
     bot = Bot(token=bot_token)
@@ -22,7 +26,8 @@ async def main():
 
             await asyncio.sleep(7)  # throttle for Groq rate limits
 
-        await bot.send_message(chat_id=chat_id, text=result[:4000], parse_mode="Markdown")
+        escaped_result = escape_markdown(result)
+        await bot.send_message(chat_id=chat_id, text=escaped_result[:4000], parse_mode="MarkdownV2")
 
 if __name__ == "__main__":
     asyncio.run(main())
