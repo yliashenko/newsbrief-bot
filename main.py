@@ -6,8 +6,8 @@ from aiogram import Bot
 from config import bot_token, chat_id, channel_streams
 
 def escape_markdown(text):
-    # Екрануємо лише символи, які обов'язково треба екранувати у MarkdownV2
-    return re.sub(r'([_\*\[\]\(\)~`>#+=|{}!\-])', r'\\\1', text)
+    # Екранує всі спецсимволи MarkdownV2, включно з крапкою
+    return re.sub(r'([_\*\[\]\(\)~`>#+=|{}!\\\.\-])', r'\\\1', text)
 
 def build_bold_linked_title(title: str, channel_id: int, message_id: int) -> str:
     escaped_title = escape_markdown(title)
@@ -77,7 +77,10 @@ async def main():
         if len(result) > 4000:
             result = result[:3995] + "..."
 
-        await bot.send_message(chat_id=chat_id, text=result, parse_mode="MarkdownV2")
+        try:
+            await bot.send_message(chat_id=chat_id, text=result, parse_mode="MarkdownV2")
+        except Exception as e:
+            print(f"❌ Помилка надсилання повідомлення: {e}")
 
 if __name__ == "__main__":
     asyncio.run(main())
