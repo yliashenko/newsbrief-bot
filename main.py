@@ -1,7 +1,7 @@
 import asyncio
 import re
 from telegram_client import get_channel_posts
-from summarizer import summarize_texts
+from summarizer import summarize_texts, generate_title
 from aiogram import Bot
 from config import bot_token, chat_id, channel_streams
 
@@ -13,7 +13,7 @@ def build_bold_linked_title(title: str, channel_id: int, message_id: int) -> str
     if channel_id and message_id:
         chat_link = f"https://t.me/c/{channel_id}/{message_id}"
         return f"[{escaped_title}]({chat_link})"
-    return f"{escaped_title}"
+    return escaped_title
 
 async def main():
     bot = Bot(token=bot_token)
@@ -25,8 +25,13 @@ async def main():
         empty_stream = True
 
         for channel, posts in posts_by_channel.items():
-            channel_title = posts[0].get("channel_title") if posts and posts[0].get("channel_title") else channel
-            channel_label = escape_markdown(channel_title)
+            channel_title = None
+            for post in posts:
+                if post.get("channel_title"):
+                    channel_title = post.get("channel_title")
+                    break
+            channel_label = escape_markdown(channel_title or channel)
+
             result += f"\n\U0001F4CC *{channel_label}*:\n"
 
             if not posts:
@@ -42,12 +47,11 @@ async def main():
                     if not text:
                         continue
 
-                    lines = text.strip().split("\n")
-                    title = lines[0].strip() if lines else "Без заголовка"
-                    summary = " ".join(line.strip() for line in lines[1:])
+                    # Згенерувати заголовок та summary
+                    title = await generate_title(text)
+                    summary = await summarize_texts([text])
 
                     emoji = "🤖" if "ai" in stream_name.lower() else "🧠"
-
                     title_link = build_bold_linked_title(title, channel_id, message_id)
                     prefix = escape_markdown(f"{idx+1}.{emoji}")
 

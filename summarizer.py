@@ -21,3 +21,22 @@ async def summarize_texts(texts):
     )
 
     return response["choices"][0]["message"]["content"]
+
+async def generate_title(text: str) -> str:
+    prompt = (
+        "На основі цього повідомлення з Telegram згенеруй короткий, лаконічний заголовок українською. "
+        "Заголовок має викликати зацікавлення і дати уявлення про зміст:\n\n"
+        f"{text}"
+    )
+
+    response = openai.ChatCompletion.create(
+        model="mistral-saba-24b",
+        messages=[
+            {"role": "system", "content": "Ти пишеш новинні заголовки для Telegram дайджестів."},
+            {"role": "user", "content": prompt}
+        ],
+        max_tokens=64,
+        temperature=0.5,
+    )
+
+    return response["choices"][0]["message"]["content"].strip()
