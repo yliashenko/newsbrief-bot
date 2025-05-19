@@ -7,7 +7,21 @@ async def get_channel_posts(channels: list[str], limit=10):
         for channel in channels:
             try:
                 messages = await client.get_messages(channel, limit=limit)
-                result[channel] = messages
+                enriched = [
+                    {
+                        "text": m.message,
+                        "id": m.id,
+                        "channel_id": m.peer_id.channel_id if hasattr(m.peer_id, "channel_id") else None
+                    }
+                    for m in messages if hasattr(m, 'message') and m.message
+                ]
+                result[channel] = enriched
             except Exception as e:
-                result[channel] = [type("Error", (object,), {"message": f"⚠️ Не вдалося отримати повідомлення з {channel}: {e}"})()]
+                result[channel] = [
+                    {
+                        "text": f"⚠️ Не вдалося отримати повідомлення з {channel}: {e}",
+                        "id": None,
+                        "channel_id": None
+                    }
+                ]
     return result
