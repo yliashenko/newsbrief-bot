@@ -6,7 +6,7 @@ from aiogram import Bot
 from config import bot_token, chat_id, channel_streams
 
 def escape_markdown(text):
-    # Екрануємо лише обов'язкові символи MarkdownV2 (без крапки)
+    # Екрануємо лише символи, які обов'язково треба екранувати у MarkdownV2
     return re.sub(r'([_\*\[\]\(\)~`>#+=|{}!\-])', r'\\\1', text)
 
 def build_bold_linked_title(title: str, channel_id: int, message_id: int) -> str:
@@ -74,7 +74,10 @@ async def main():
         if empty_stream:
             result += "\n⚠️ У цьому потоці не вдалося сформувати жодного зведення.\n"
 
-        await bot.send_message(chat_id=chat_id, text=result[:4000], parse_mode="MarkdownV2")
+        if len(result) > 4000:
+            result = result[:3995] + "..."
+
+        await bot.send_message(chat_id=chat_id, text=result, parse_mode="MarkdownV2")
 
 if __name__ == "__main__":
     asyncio.run(main())
