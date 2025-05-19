@@ -8,7 +8,7 @@ from config import bot_token, chat_id, channel_streams
 def escape_markdown(text):
     return re.sub(r'([_\*\[\]\(\)~`>#+\-=|{}.!])', r'\\\1', text)
 
-def build_post_link(title: str, channel_id: int, message_id: int) -> str:
+def build_bold_linked_title(title: str, channel_id: int, message_id: int) -> str:
     escaped_title = escape_markdown(title)
     if channel_id and message_id:
         chat_link = f"https://t.me/c/{channel_id}/{message_id}"
@@ -25,7 +25,8 @@ async def main():
         empty_stream = True
 
         for channel, posts in posts_by_channel.items():
-            channel_label = escape_markdown(channel)
+            channel_title = posts[0].get("channel_title") if posts and posts[0].get("channel_title") else channel
+            channel_label = escape_markdown(channel_title)
             result += f"\n\U0001F4CC *{channel_label}*:\n"
 
             if not posts:
@@ -43,10 +44,13 @@ async def main():
 
                     lines = text.strip().split("\n")
                     title = lines[0].strip() if lines else "Без заголовка"
-                    summary = " ".join(line.strip() for line in lines[1:4])
+                    summary = " ".join(line.strip() for line in lines[1:])
 
-                    link = build_post_link(f"{idx+1}. {title}", channel_id, message_id)
-                    result += f"{link} — {escape_markdown(summary)}\n"
+                    emoji = "🤖" if "ai" in stream_name.lower() else "🧠"
+
+                    title_link = build_bold_linked_title(title, channel_id, message_id)
+
+                    result += f"{idx+1}.{emoji} {title_link}:\n{escape_markdown(summary)}\n\n"
 
                 empty_stream = False
             except Exception as e:
