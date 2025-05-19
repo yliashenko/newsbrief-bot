@@ -47,13 +47,24 @@ async def main():
                     if not text:
                         continue
 
-                    # Згенерувати заголовок та summary
                     title = await generate_title(text)
                     summary = await summarize_texts([text])
 
+                    # Обрізати занадто довге summary
+                    summary = summary.strip()
+                    if len(summary) > 700:
+                        summary = summary[:700].rsplit(".", 1)[0] + "."
+
+                    # Видалити зайві рядки типу "Зведення з Telegram"
+                    summary = re.sub(r"(?i)^\*+Зведення з Telegram:?\*+", "", summary).strip()
+
+                    # Якщо summary у форматі маркованого списку — перетворити в абзац
+                    summary = re.sub(r"\n\d+[\)\.\-]", ".", summary).strip()
+                    summary = re.sub(r"\n+", " ", summary)
+
                     emoji = "🤖" if "ai" in stream_name.lower() else "🧠"
                     title_link = build_bold_linked_title(title, channel_id, message_id)
-                    prefix = escape_markdown(f"{idx+1}.{emoji}")
+                    prefix = escape_markdown(f"{idx+1}\.{emoji}")
 
                     result += f"{prefix} {title_link}:\n{escape_markdown(summary)}\n\n"
 
