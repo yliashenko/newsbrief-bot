@@ -43,8 +43,10 @@ async def main():
 
                     lines = text.strip().split("\n")
                     title = lines[0].strip() if lines else "Без заголовка"
-                    link_line = build_post_link(f"{idx+1}. {title}", channel_id, message_id)
-                    result += f"{link_line}\n"
+                    summary = " ".join(line.strip() for line in lines[1:4])
+
+                    link = build_post_link(f"{idx+1}. {title}", channel_id, message_id)
+                    result += f"{link} — {escape_markdown(summary)}\n"
 
                 empty_stream = False
             except Exception as e:

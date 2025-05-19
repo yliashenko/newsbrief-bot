@@ -12,23 +12,22 @@ channel_streams = {
         "@denissexy",
         "@imatrofAI",
         "@seeallochnaya",
-        "@ppprompt"
+        "@ppprompt",
     ],
     "intresting": [
         "@spekamedia",
         "@iSIGHTmedia",
-        "@wallstreetukr"
-        "@MichaelPatsan"
-        "@theworldisnoteasy"
-        "@keddr"
+        "@wallstreetukr",
+        "@MichaelPatsan",
+        "@theworldisnoteasy",
+        "@keddr",
     ],
     "crypto": [
         "@crypto_rostik",
         "@wvlad.crew",
     ],
     "politics": [
-        "@OstanniyCapitalist"
-        "@resurgammmm"
-
+        "@OstanniyCapitalist",
+        "@resurgammmm",
     ]
 }
