@@ -3,8 +3,10 @@ from config import channel_groups
 from digest_thread import DigestThread
 from logger import logger
 from cache import init_db
+from telegram_client import start_client
 
 async def main():
+    await start_client()
     logger.info("🚀 Запуск асинхронної обробки потоків")
 
     tasks = []
@@ -14,7 +16,3 @@ async def main():
 
     await asyncio.gather(*tasks)
     logger.info("✅ Усі потоки оброблено")
-
-if __name__ == "__main__":
-    init_db()
-    asyncio.run(main())
