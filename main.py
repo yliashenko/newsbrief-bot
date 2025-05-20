@@ -6,19 +6,19 @@ from aiogram import Bot
 from config import bot_token, chat_id, channel_streams
 
 def escape_markdown(text: str) -> str:
-    # Повне екранування для MarkdownV2
-    return re.sub(r'([_\*\[\]\(\)~`>#+=|{}!\\\.\-])', r'\\\1', text)
+    # Повне екранування MarkdownV2, включаючи '.' і '-'
+    return re.sub(r'([_\*\[\]\(\)~`>#+=|{}!\\.\-])', r'\\\1', text)
 
 def escape_link_text(text: str) -> str:
-    # Обмежене екранування — не чіпає крапку й дужки
-    return re.sub(r'([_\*~`>#+=|{}!\\])', r'\\\1', text)
+    # Для тексту всередині [назва](посилання): не екранує '.' та '-', бо вони валідні в URL
+    return re.sub(r'([_\*\[\]\(\)~`>#+=|{}!\\])', r'\\\1', text)
 
 def build_bold_linked_title(title: str, channel_id: int, message_id: int) -> str:
-    clean_title = escape_link_text(title)
+    escaped_title = escape_link_text(title)
     if channel_id and message_id:
         chat_link = f"https://t.me/c/{channel_id}/{message_id}"
-        return f"[{clean_title}]({chat_link})"
-    return clean_title
+        return f"[{escaped_title}]({chat_link})"
+    return escaped_title
 
 async def main():
     bot = Bot(token=bot_token)
