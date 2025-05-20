@@ -25,3 +25,12 @@ async def get_channel_posts(channels: list[str], limit=10):
                     }
                 ]
     return result
+
+
+async def get_channel_title(channel: str) -> str:
+    async with TelegramClient("user_session", api_id, api_hash) as client:
+        try:
+            entity = await client.get_entity(channel)
+            return entity.title
+        except Exception:
+            return channel  # fallback до username, якщо назву не вдалося отримати
