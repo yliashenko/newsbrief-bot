@@ -1,9 +1,9 @@
 from telethon import TelegramClient
-from config import api_id, api_hash
+from config import API_ID, API_HASH
 
 async def get_channel_posts(channels: list[str], limit=10):
     result = {}
-    async with TelegramClient("user_session", api_id, api_hash) as client:
+    async with TelegramClient("user_session", API_ID, API_HASH) as client:
         for channel in channels:
             try:
                 messages = await client.get_messages(channel, limit=limit)
@@ -28,7 +28,7 @@ async def get_channel_posts(channels: list[str], limit=10):
 
 
 async def get_channel_title(channel: str) -> str:
-    async with TelegramClient("user_session", api_id, api_hash) as client:
+    async with TelegramClient("user_session", API_ID, API_HASH) as client:
         try:
             entity = await client.get_entity(channel)
             return entity.title
