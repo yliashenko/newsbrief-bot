@@ -3,12 +3,11 @@ from logger import logger
 from cache import is_seen, mark_seen
 
 async def fetch_posts_for_channels(channels: list, limit: int = 20) -> list:
-    from asyncio import to_thread
     all_posts = []
 
     for channel in channels:
         try:
-            posts = await to_thread(get_channel_posts, channel, limit)
+            posts = await get_channel_posts(channel, limit)
             new_posts = []
 
             for post in posts:
