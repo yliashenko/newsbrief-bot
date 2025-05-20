@@ -22,7 +22,7 @@ def format_digest(category: str, posts: list, emoji: str) -> str | None:
             f"<b>{i}. {emoji} {summary['title']}</b><br>"
             f"{summary['summary']}<br>"
             f'<a href="{post["url"]}">Читати пост</a><br>'
-            f'<hr>'
+            f'— — —'
         )
 
         if total_length + len(block) > MAX_MESSAGE_LENGTH:

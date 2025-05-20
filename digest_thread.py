@@ -4,6 +4,8 @@ from poster import send_message
 from config import GROUP_EMOJIS
 from logger import logger
 
+MAX_POSTS_PER_REQUEST = 20  # обмеження для уникнення 413
+
 class DigestThread:
     def __init__(self, category: str, channels: list):
         self.category = category
@@ -14,6 +16,11 @@ class DigestThread:
         logger.info(f"▶️ Старт потоку: {self.category}")
         posts = await fetch_posts_for_channels(self.channels)
         logger.info(f"📦 Отримано {len(posts)} постів у потоці '{self.category}'")
+
+        # обрізаємо, якщо постів більше ніж дозволено
+        if len(posts) > MAX_POSTS_PER_REQUEST:
+            logger.warning(f"✂️ Зрізано {len(posts) - MAX_POSTS_PER_REQUEST} постів через ліміт prompt")
+            posts = posts[:MAX_POSTS_PER_REQUEST]
 
         digest = format_digest(self.category, posts, self.emoji)
 
