@@ -1,42 +1,74 @@
-import openai
-import os
+import requests
+import time
+from config import GROQ_API_KEY, DEFAULT_MODEL, FALLBACK_MODEL, MAX_RETRIES
+from logger import logger
 
-openai.api_key = os.environ["GROQ_API_KEY"]
-openai.api_base = "https://api.groq.com/openai/v1"
+HEADERS = {
+    "Authorization": f"Bearer {GROQ_API_KEY}",
+    "Content-Type": "application/json"
+}
 
-async def summarize_texts(texts):
-    prompt = (
-        "Ось добірка повідомлень з Telegram. "
-        "Сформуй коротке зведення (2–5 тез українською):\n\n" + "\n\n".join(texts)
-    )
+def summarize_texts(posts: list, model: str = DEFAULT_MODEL, attempt=1) -> list:
+    """
+    Генерує список саммарі для кожного поста.
+    Підтримує fallback-модель та retry-механізм.
+    """
+    texts = [post["text"] for post in posts if post.get("text")]
+    if not texts:
+        logger.warning("📭 У постах немає тексту")
+        return [{"title": "❌ Немає тексту", "summary": "Пост порожній або недоступний"}]
 
-    response = openai.ChatCompletion.create(
-        model="mistral-saba-24b",
-        messages=[
-            {"role": "system", "content": "Ти аналітик новин. Формуй короткі дайджести."},
+    prompt = build_prompt(texts)
+    payload = {
+        "model": model,
+        "messages": [
+            {"role": "system", "content": "Стисло підсумуй кожен із наведених постів. Додай заголовок і короткий опис."},
             {"role": "user", "content": prompt}
-        ],
-        max_tokens=512,
-        temperature=0.7,
-    )
+        ]
+    }
 
-    return response["choices"][0]["message"]["content"]
+    try:
+        start_time = time.time()
+        response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=HEADERS, json=payload)
+        duration = time.time() - start_time
 
-async def generate_title(text: str) -> str:
-    prompt = (
-        "На основі цього повідомлення з Telegram згенеруй короткий, лаконічний заголовок українською. "
-        "Заголовок має викликати зацікавлення і дати уявлення про зміст:\n\n"
-        f"{text}"
-    )
+        response.raise_for_status()
+        result = response.json()["choices"][0]["message"]["content"]
+        logger.info(f"✅ Groq відповідь ({model}) за {duration:.2f}с")
+        return parse_summaries(result, len(texts))
 
-    response = openai.ChatCompletion.create(
-        model="mistral-saba-24b",
-        messages=[
-            {"role": "system", "content": "Ти пишеш новинні заголовки для Telegram дайджестів."},
-            {"role": "user", "content": prompt}
-        ],
-        max_tokens=64,
-        temperature=0.5,
-    )
+    except Exception as e:
+        logger.warning(f"⚠️ [Спроба {attempt}] Groq помилка для моделі {model}: {e}")
 
-    return response["choices"][0]["message"]["content"].strip()
+        if attempt < MAX_RETRIES:
+            time.sleep(2 * attempt)  # експоненціальна затримка
+            return summarize_texts(posts, model=model, attempt=attempt + 1)
+
+        elif model != FALLBACK_MODEL:
+            logger.warning(f"🔁 Переходимо на fallback-модель: {FALLBACK_MODEL}")
+            return summarize_texts(posts, model=FALLBACK_MODEL, attempt=1)
+
+        else:
+            logger.error("❌ Не вдалося згенерувати саммарі навіть з fallback-моделлю.")
+            return [{"title": "❌ Помилка", "summary": "Не вдалося згенерувати дайджест"}]
+
+def build_prompt(texts: list) -> str:
+    return "\n\n".join([f"{i+1}. {text.strip()}" for i, text in enumerate(texts)])
+
+def parse_summaries(response_text: str, expected_count: int) -> list:
+    """
+    Спліт тексту від LLM на окремі блоки з заголовком і саммарі.
+    """
+    summaries = response_text.strip().split("\n\n")
+    parsed = []
+
+    for s in summaries:
+        lines = s.strip().split("\n", 1)
+        title = lines[0].strip() if len(lines) > 0 else "Без назви"
+        summary = lines[1].strip() if len(lines) > 1 else ""
+        parsed.append({"title": title, "summary": summary})
+
+    while len(parsed) < expected_count:
+        parsed.append({"title": "❌ Пропущено", "summary": "LLM не повернула саммарі."})
+
+    return parsed[:expected_count]

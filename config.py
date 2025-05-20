@@ -1,13 +1,22 @@
 import os
+from dotenv import load_dotenv
 
-api_id = int(os.environ["API_ID"])
-api_hash = os.environ["API_HASH"]
-bot_token = os.environ["BOT_TOKEN"]
-openai_api_key = os.environ["GROQ_API_KEY"]
-chat_id = int(os.environ["CHAT_ID"])
+load_dotenv()
 
-# Тематичні потоки: "ai", "psychology", "crypto"
-channel_streams = {
+# === Telegram + Groq API Keys ===
+API_ID = os.getenv("API_ID")
+API_HASH = os.getenv("API_HASH")
+BOT_TOKEN = os.getenv("BOT_TOKEN")
+CHAT_ID = os.getenv("CHAT_ID")
+GROQ_API_KEY = os.getenv("GROQ_API_KEY")
+
+# === LLM Settings ===
+DEFAULT_MODEL = "mistral-saba-24b"
+FALLBACK_MODEL = "mixtral-8x7b"
+MAX_RETRIES = 3
+
+# === Канали, згруповані по категоріях ===
+channel_groups = {
     "ai": [
         "@denissexy",
         "@imatrofAI",
@@ -29,4 +38,11 @@ channel_streams = {
         "@OstanniyCapitalist",
         "@resurgammmm",
     ]
+}
+
+GROUP_EMOJIS = {
+    "ai": "🤖",
+    "intresting": "🔍",
+    "crypto": "📈",
+    "politics": "📑",
 }
