@@ -1,36 +1,38 @@
-from telethon import TelegramClient
+from telethon.sync import TelegramClient
 from config import API_ID, API_HASH
+from telethon.tl.types import Message
 
-async def get_channel_posts(channels: list[str], limit=10):
-    result = {}
-    async with TelegramClient("user_session", API_ID, API_HASH) as client:
-        for channel in channels:
-            try:
-                messages = await client.get_messages(channel, limit=limit)
-                enriched = [
-                    {
-                        "text": m.message,
-                        "id": m.id,
-                        "channel_id": m.peer_id.channel_id if hasattr(m.peer_id, "channel_id") else None
-                    }
-                    for m in messages if hasattr(m, 'message') and m.message
-                ]
-                result[channel] = enriched
-            except Exception as e:
-                result[channel] = [
-                    {
-                        "text": f"⚠️ Не вдалося отримати повідомлення з {channel}: {e}",
-                        "id": None,
-                        "channel_id": None
-                    }
-                ]
-    return result
+# Ініціалізація клієнта один раз
+client = TelegramClient("user_session", API_ID, API_HASH)
 
+async def get_channel_posts(channel_username: str, limit: int = 20) -> list:
+    """
+    Отримує останні повідомлення з каналу та повертає список словників:
+    { id, text, url }
+    """
+    async with client:
+        try:
+            messages = await client.get_messages(channel_username, limit=limit)
+            return [
+                {
+                    "id": msg.id,
+                    "text": msg.message,
+                    "url": f"https://t.me/{channel_username.strip('@')}/{msg.id}"
+                }
+                for msg in messages if msg.message
+            ]
+        except Exception as e:
+            print(f"⚠️ Не вдалося отримати повідомлення з {channel_username}: {e}")
+            return []
 
 async def get_channel_title(channel: str) -> str:
+    """
+    Отримує повну назву каналу по username.
+    Повертає username як fallback у разі помилки.
+    """
     async with TelegramClient("user_session", API_ID, API_HASH) as client:
         try:
             entity = await client.get_entity(channel)
             return entity.title
         except Exception:
-            return channel  # fallback до username, якщо назву не вдалося отримати
+            return channel  # fallback до username
