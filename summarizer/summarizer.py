@@ -11,4 +11,8 @@ async def summarize_texts(posts: list, model: str = DEFAULT_MODEL) -> list:
     texts = [sanitize_post_text(p["text"]) for p in posts if p.get("text")]
     prompt = build_prompt(texts)
     response_text = await call_llm(prompt, model=model)
+
+    if response_text.strip().startswith("❌"):
+        return [{"title": "❌", "summary": response_text.strip()}]
+
     return parse_summaries(response_text, expected_count=len(posts))
