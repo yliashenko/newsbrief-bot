@@ -1,6 +1,5 @@
 from digest.fetcher import fetch_posts_for_channels
 from bot.formatter import format_digest
-from bot.poster import send_message
 from config import GROUP_EMOJIS, MAX_POSTS_PER_REQUEST
 from shared.logger import logger
 
