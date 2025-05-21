@@ -18,7 +18,7 @@ MAX_NEW_POSTS_PER_CHANNEL = 10
 
 MAX_PARALLEL_THREADS = 2
 MAX_CONCURRENT_THREADS = 2
-MAX_POSTS_PER_REQUEST = 15
+MAX_POSTS_PER_REQUEST = 10
 
 SYSTEM_PROMPT = (
     "Ти — бот, що формує щоденні дайджести з Telegram-постів українською мовою. "
@@ -63,7 +63,6 @@ GROUP_EMOJIS = {
     "intresting": "🔍",
     "crypto": "📈",
     "politics": "📑",
-    "pin": "📌"
 }
 
 POST_ENTRY_EMOJI = "📌"

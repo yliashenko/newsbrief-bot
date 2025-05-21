@@ -17,6 +17,9 @@ async def format_digest(category: str, posts: list[TelegramPost], emoji: str) ->
     for i, (post, summary) in enumerate(zip(posts, summaries), start=1):
         title = clean_summary_text(summary["title"])
         summary_text = clean_summary_text(summary["summary"])
+        if title.strip() == "-" and summary_text.strip() == "-":
+            title = "⚠️ Не вдалося згенерувати саммарі"
+            summary_text = "Спроба генерації не дала результату."
         url = f"https://t.me/{post['channel']}/{post['id']}"
 
         block = format_entry(i, title, summary_text, url)

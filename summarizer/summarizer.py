@@ -14,7 +14,7 @@ async def summarize_texts(posts: list, model: str = DEFAULT_MODEL) -> list:
     ]
     cleaned_pairs = cleaned_pairs[:MAX_POSTS_PER_REQUEST]
     posts, texts = zip(*cleaned_pairs) if cleaned_pairs else ([], [])
-    prompt = build_prompt(texts)
+    prompt = build_prompt(list(texts))
     response_text = await call_llm(prompt, model=model)
 
     if response_text.strip().startswith("❌"):
