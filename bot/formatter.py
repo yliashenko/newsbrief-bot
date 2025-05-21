@@ -1,3 +1,4 @@
+from config import POST_ENTRY_EMOJI
 from shared.types import TelegramPost, SummaryEntry
 from summarizer.summarizer import summarize_texts
 from shared.logger import logger
@@ -30,11 +31,11 @@ async def format_digest(category: str, posts: list[TelegramPost], emoji: str) ->
     return "\n".join(result)
 
 def format_title(category: str, emoji: str) -> str:
-    return f"{emoji} Що нового: <b>{category.upper()}</b>\n"
+    return f"Що нового: <b>{category.upper()} {emoji}</b>\n"
 
 def format_entry(index: int, title: str, summary: str, url: str) -> str:
     return (
-        f"<b>{index}. {title}</b>\n"
+        f"<b>{POST_ENTRY_EMOJI} {title}</b>\n"
         f"{summary}\n"
         f'<a href="{url}">Читати пост →</a>\n'
     )

@@ -1,9 +1,10 @@
+from config import DEFAULT_MODEL
 from summarizer.prompt_builder import build_prompt
 from summarizer.parser import parse_summaries
 from summarizer.llm_client import call_llm
 from summarizer.sanitizer import sanitize_post_text
 
-async def summarize_texts(posts: list, model: str = None) -> list:
+async def summarize_texts(posts: list, model: str = DEFAULT_MODEL) -> list:
     if not posts:
         return [{"title": "⚠️ Немає постів", "summary": "Не було знайдено нових повідомлень для аналізу."}]
 

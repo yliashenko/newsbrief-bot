@@ -63,4 +63,7 @@ GROUP_EMOJIS = {
     "intresting": "🔍",
     "crypto": "📈",
     "politics": "📑",
+    "pin": "📌"
 }
+
+POST_ENTRY_EMOJI = "📌"
