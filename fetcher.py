@@ -8,8 +8,12 @@ async def fetch_posts_for_channels(channels: list, limit: int = 20) -> list:
     for channel in channels:
         try:
             posts = await get_channel_posts(channel, limit)
-            new_posts = []
 
+            if not posts:
+                logger.warning(f"⚠️ Порожній результат або None з @{channel}")
+                continue
+
+            new_posts = []
             for post in posts:
                 message_id = post.get("id")
                 if not is_seen(channel, message_id):
