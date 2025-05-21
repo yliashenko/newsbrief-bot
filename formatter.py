@@ -19,9 +19,9 @@ def format_digest(category: str, posts: list, emoji: str) -> str | None:
 
     for i, (post, summary) in enumerate(zip(posts, summaries), start=1):
         block = (
-            f"<b>{i}. {emoji} {summary['title']}</b><br>"
-            f"{summary['summary']}<br>"
-            f'<a href="{post["url"]}">Читати пост</a><br>'
+            f"<b>{i}. {emoji} {summary['title']}</b>\n"
+            f"{summary['summary']}\n"
+            f'<a href="{post["url"]}">Читати пост</a>\n'
             f'— — —'
         )
 
