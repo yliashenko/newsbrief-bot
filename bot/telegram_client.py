@@ -1,6 +1,6 @@
 from telethon import TelegramClient
 from config import API_ID, API_HASH
-from logger import logger
+from shared.logger import logger
 
 client = TelegramClient("user_session", API_ID, API_HASH)
 
@@ -12,6 +12,8 @@ async def start_client():
         raise RuntimeError("❌ Телеграм клієнт не авторизований")
 
 async def get_channel_posts(channel_username: str, limit: int = 20) -> list:
+    if not client.is_connected():
+        await client.connect()
     try:
         messages = await client.get_messages(channel_username, limit=limit)
         return [

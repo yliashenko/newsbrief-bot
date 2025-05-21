@@ -10,10 +10,11 @@ BOT_TOKEN = os.getenv("BOT_TOKEN")
 CHAT_ID = os.getenv("CHAT_ID")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
-# === LLM Settings ===
+# === Settings ===
 DEFAULT_MODEL = "mistral-saba-24b"
 FALLBACK_MODEL = "llama3-8b-8192"
 MAX_RETRIES = 3
+MAX_NEW_POSTS_PER_CHANNEL = 10
 
 MAX_PARALLEL_THREADS = 2
 MAX_CONCURRENT_THREADS = 2

@@ -1,6 +1,7 @@
-from telegram_client import get_channel_posts
-from logger import logger
-from cache import is_seen, mark_seen
+from bot.telegram_client import get_channel_posts
+from shared.logger import logger
+from bot.cache import is_seen, mark_seen
+from config import MAX_NEW_POSTS_PER_CHANNEL
 
 async def fetch_posts_for_channels(channels: list, limit: int = 20) -> list:
     all_posts = []
@@ -22,6 +23,7 @@ async def fetch_posts_for_channels(channels: list, limit: int = 20) -> list:
                 else:
                     logger.debug(f"🔁 {channel} — вже бачили post #{message_id}")
 
+            new_posts = new_posts[:MAX_NEW_POSTS_PER_CHANNEL]
             logger.info(f"📨 {channel} → {len(new_posts)} нових постів (з {len(posts)})")
             all_posts.extend(new_posts)
 
