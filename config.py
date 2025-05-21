@@ -18,7 +18,7 @@ MAX_NEW_POSTS_PER_CHANNEL = 10
 
 MAX_PARALLEL_THREADS = 2
 MAX_CONCURRENT_THREADS = 2
-MAX_POSTS_PER_REQUEST = 20
+MAX_POSTS_PER_REQUEST = 15
 
 SYSTEM_PROMPT = (
     "Ти — бот, що формує щоденні дайджести з Telegram-постів українською мовою. "
