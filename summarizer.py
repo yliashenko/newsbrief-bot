@@ -20,17 +20,20 @@ async def summarize_texts(posts: list, model: str = DEFAULT_MODEL, attempt=1) ->
         "model": model,
         "messages": [
             {
-                "role": "system", 
-                "content": "Briefly summarize each(from the very first to the last one) of the posts listed. Add a title (one sentence that summerizes the whole post) and a short description. DO NOT add additional fields or structure. Translate to Ukrainian language"},
-            {
-                "role": "user", 
-                "content": prompt
-            }
+                "role": "system",
+                "content": (
+                    "Стисло підсумуй кожен(з самого першого до смого останнього) із наведених постів. Для кожного: \n"
+                    "1. Додай заголовок (одним реченням, без нумерації).\n"
+                    "2. Додай короткий опис у 1–2 реченнях.\n"
+                    "Не додавай зайвих структур типу 'Тип поста:', 'Категорія:' чи тегів."
+                )
+            },
+            {"role": "user", "content": prompt}
         ]
     }
 
     try:
-        await asyncio.sleep(1.5)  # rate limit protection
+        await asyncio.sleep(1.5)
         start_time = time.time()
         async with aiohttp.ClientSession() as session:
             async with session.post(
@@ -40,10 +43,8 @@ async def summarize_texts(posts: list, model: str = DEFAULT_MODEL, attempt=1) ->
             ) as response:
                 duration = time.time() - start_time
                 if response.status != 200:
-                    raise aiohttp.ClientResponseError(
-                        status=response.status,
-                        message=await response.text()
-                    )
+                    error_text = await response.text()
+                    raise Exception(f"{response.status} {response.reason}: {error_text}")
                 data = await response.json()
 
         result = data["choices"][0]["message"]["content"]
@@ -75,7 +76,7 @@ def parse_summaries(response_text: str, expected_count: int) -> list:
     for s in summaries:
         lines = s.strip().split("\n", 1)
         title = lines[0].strip() if len(lines) > 0 else "Без назви"
-        summary = lines[1].strip() if len(lines) > 1 else ""
+        summary = lines[1].strip() if len(lines) > 1 else "⚠️ LLM не повернула опис для цього поста."
         parsed.append({"title": title, "summary": summary})
 
     while len(parsed) < expected_count:

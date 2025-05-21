@@ -9,7 +9,7 @@ async def format_digest(category: str, posts: list, emoji: str) -> str:
 
     summaries = await summarize_texts(posts)
 
-    result = [f"📚 Зведення по темі: <b>{category.upper()}</b>\n"]
+    result = [f"{emoji} Що нового: <b>{category.upper()}</b>\n"]
     total_length = 0
 
     for i, (post, summary) in enumerate(zip(posts, summaries), start=1):
@@ -17,10 +17,10 @@ async def format_digest(category: str, posts: list, emoji: str) -> str:
         summary_text = clean_summary_text(summary["summary"])
 
         block = (
-            f"<b>{i}. {emoji} {title}</b>\n"
+            f"<b>{i}. {title}</b>\n"
             f"{summary_text}\n"
-            f'<a href="https://t.me/{post["channel"]}/{post["id"]}">Читати пост</a>\n'
-            f'\n\n'
+            f'<a href="https://t.me/{post["channel"]}/{post["id"]}">Читати пост -></a>'
+            f'\n'
         )
         block_len = len(block)
         if total_length + block_len > 4096:
