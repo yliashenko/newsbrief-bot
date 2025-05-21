@@ -19,8 +19,13 @@ async def summarize_texts(posts: list, model: str = DEFAULT_MODEL, attempt=1) ->
     payload = {
         "model": model,
         "messages": [
-            {"role": "system", "content": "Ти висококлассний редактор відомого медіа. Стисло підсумуй кожен із наведених постів. Додай заголовок і короткий опис. Укранською мовою"},
-            {"role": "user", "content": prompt}
+            {
+                "role": "system", 
+                "content": "Briefly summarize each(from the very first to the last one) of the posts listed. Add a title (one sentence that summerizes the whole post) and a short description. DO NOT add additional fields or structure. Translate to Ukrainian language"},
+            {
+                "role": "user", 
+                "content": prompt
+            }
         ]
     }
 

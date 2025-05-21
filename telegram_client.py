@@ -13,11 +13,13 @@ async def start_client():
 async def get_channel_posts(channel_username: str, limit: int = 20) -> list:
     try:
         messages = await client.get_messages(channel_username, limit=limit)
-        return [
+        return 
+        [
             {
                 "id": msg.id,
                 "text": msg.message,
-                "url": f"https://t.me/{channel_username.strip('@')}/{msg.id}"
+                "url": f"https://t.me/{channel_username.strip('@')}/{msg.id}",
+                "channel": channel_username.strip('@')
             }
             for msg in messages if msg.message
         ]
