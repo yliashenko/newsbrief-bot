@@ -3,7 +3,7 @@ from digest.digest_thread import DigestThread
 from config import channel_groups, MAX_CONCURRENT_THREADS
 from shared.logger import logger
 from bot.formatter import format_digest
-from bot.poster import send_message
+from bot.poster import send_html_message
 from bot.telegram_client import client
 
 llm_queue = asyncio.Queue()
@@ -30,7 +30,7 @@ async def llm_worker():
         digest = await format_digest(category, posts, emoji)
 
         if digest:
-            send_message(digest)
+            send_html_message(digest)
             logger.info(f"📬 Дайджест для '{category}' надіслано")
         else:
             logger.info(f"⏭️ Категорія '{category}' не відправлена (немає контенту або перевищено ліміт)")
