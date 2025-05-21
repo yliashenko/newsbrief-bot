@@ -13,11 +13,18 @@ async def summarize_texts(posts: list, model: str = DEFAULT_MODEL) -> list:
         for p in posts if p.get("text")
     ]
     cleaned_pairs = cleaned_pairs[:MAX_POSTS_PER_REQUEST]
-    posts, texts = zip(*cleaned_pairs) if cleaned_pairs else ([], [])
+    if not cleaned_pairs:
+        return [{"title": "❌", "summary": "LLM не повернула відповідь."}]
+
+    posts, texts = zip(*cleaned_pairs)
     prompt = build_prompt(list(texts))
     response_text = await call_llm(prompt, model=model)
 
-    if response_text.strip().startswith("❌"):
-        return [{"title": "❌", "summary": response_text.strip()}]
+    if not response_text.strip():
+        return [{"title": "❌", "summary": "LLM не повернула відповідь."}]
 
-    return parse_summaries(response_text, expected_count=len(posts))
+    if response_text.strip().startswith("❌"):
+        return [{"title": "❌", "summary": "LLM не повернула відповідь."}]
+
+    summaries = parse_summaries(response_text, expected_count=len(posts))
+    return summaries[:len(posts)]

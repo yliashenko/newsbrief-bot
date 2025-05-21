@@ -17,17 +17,16 @@ async def format_digest(category: str, posts: list[TelegramPost], emoji: str) ->
     for i, (post, summary) in enumerate(zip(posts, summaries), start=1):
         title = clean_summary_text(summary["title"])
         summary_text = clean_summary_text(summary["summary"])
-        if title.strip() == "-" and summary_text.strip() == "-":
-            title = "⚠️ Не вдалося згенерувати саммарі"
-            summary_text = "Спроба генерації не дала результату."
         url = f"https://t.me/{post['channel']}/{post['id']}"
-
-        block = format_entry(i, title, summary_text, url)
-        block_len = len(block)
+        if not title and not summary_text:
+            entry_block = f"<b>{POST_ENTRY_EMOJI} ❌</b>\nLLM не повернула відповідь.\n<a href=\"{url}\">Читати пост →</a>\n"
+        else:
+            entry_block = format_entry(i, title, summary_text, url)
+        block_len = len(entry_block)
         if total_length + block_len > 4096:
             logger.warning(f"✂️ Дайджест '{category}' досяг ліміту символів. Зупинка на {i} постах.")
             break
-        result.append(block)
+        result.append(entry_block)
         total_length += block_len
 
     result.append(format_footer())
