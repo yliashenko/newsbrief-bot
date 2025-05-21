@@ -5,6 +5,7 @@ from shared.logger import logger
 from bot.formatter import format_digest
 from bot.poster import send_html_message
 from bot.telegram_client import client
+from bot.cache import init_db
 
 llm_queue = asyncio.Queue()
 semaphore = asyncio.Semaphore(MAX_CONCURRENT_THREADS)
@@ -46,5 +47,6 @@ async def main():
     worker_task.cancel()
 
 if __name__ == "__main__":
+    init_db()
     logger.info("🐣 main.py launched")
     asyncio.run(main())
