@@ -27,4 +27,4 @@ async def summarize_texts(posts: list, model: str = DEFAULT_MODEL) -> list:
         return [{"title": "❌", "summary": "LLM не повернула відповідь."}]
 
     summaries = parse_summaries(response_text, expected_count=len(posts))
-    return [{"title": s.title.strip(), "summary": s.summary.strip()} for s in summaries[:len(posts)] if s.title.strip() or s.summary.strip()]
+    return summaries[:len(posts)]
