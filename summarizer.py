@@ -1,7 +1,7 @@
 import aiohttp
 import asyncio
 import time
-from config import GROQ_API_KEY, DEFAULT_MODEL, FALLBACK_MODEL, MAX_RETRIES
+from config import GROQ_API_KEY, DEFAULT_MODEL, FALLBACK_MODEL, MAX_RETRIES, SYSTEM_PROMPT
 from logger import logger
 
 HEADERS = {
@@ -19,15 +19,7 @@ async def summarize_texts(posts: list, model: str = DEFAULT_MODEL, attempt=1) ->
     payload = {
         "model": model,
         "messages": [
-            {
-                "role": "system",
-                "content": (
-                    "Стисло підсумуй кожен(з самого першого до смого останнього) із наведених постів. Для кожного: \n"
-                    "1. Додай заголовок (одним реченням, без нумерації).\n"
-                    "2. Додай короткий опис у 1–2 реченнях.\n"
-                    "Не додавай зайвих структур типу 'Тип поста:', 'Категорія:' чи тегів."
-                )
-            },
+            {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": prompt}
         ]
     }
