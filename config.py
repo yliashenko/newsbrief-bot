@@ -47,6 +47,7 @@ channel_groups = {
         "@MichaelPatsan",
         "@theworldisnoteasy",
         "@keddr",
+        "@prostirspokoy",
     ],
     "crypto": [
         "@crypto_rostik",

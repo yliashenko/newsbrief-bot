@@ -1,7 +1,7 @@
 from summarizer.prompt_builder import build_prompt
 from summarizer.parser import parse_summaries
 from summarizer.llm_client import call_llm
-from sanitizer import sanitize_post_text
+from summarizer.sanitizer import sanitize_post_text
 
 async def summarize_texts(posts: list, model: str = None) -> list:
     if not posts:
