@@ -8,6 +8,7 @@ from loguru import logger
 def send_html_message(html: str):
     for attempt in range(1, MAX_RETRIES + 1):
         try:
+            logger.debug(f"📤 HTML до Telegram:\n{html}")
             response = requests.post(
                 f"https://api.telegram.org/bot{BOT_TOKEN}/sendMessage",
                 data={
@@ -18,11 +19,12 @@ def send_html_message(html: str):
                 },
                 timeout=15
             )
-            if response.status_code == 200:
+            resp_json = response.json()
+            if response.status_code == 200 and resp_json.get("ok"):
                 logger.info("✅ Повідомлення успішно надіслано в Telegram.")
                 return
             else:
-                raise Exception(f"{response.status_code} {response.reason}: {response.text}")
+                raise Exception(f"{response.status_code} {response.reason}: {resp_json}")
         except Exception as e:
             logger.warning(f"⚠️ [Спроба {attempt}] Помилка надсилання повідомлення: {e}")
             if attempt < MAX_RETRIES:
