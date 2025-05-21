@@ -1,21 +1,15 @@
 from summarizer import summarize_texts
 from logger import logger
 
-MAX_MESSAGE_LENGTH = 4096  # Ліміт повідомлення Telegram
-
-def format_digest(category: str, posts: list, emoji: str) -> str | None:
-    """
-    Формує HTML дайджест для однієї категорії.
-    Якщо постів немає — повертає None.
-    """
+async def format_digest(category: str, posts: list, emoji: str) -> str:
     if not posts:
         logger.warning(f"🔕 Пропущено категорію '{category}' — постів немає.")
-        return None
+        return ""
 
-    summaries = summarize_texts(posts)
+    summaries = await summarize_texts(posts)
 
-    result = [f"📚 Зведення по темі: <b>{category.capitalize}</b>"]
-    total_length = len(result[0]) + 2  # початковий заголовок + запас
+    result = [f"📚 Зведення по темі: <b>{category.upper()}</b>\n"]
+    total_length = 0
 
     for i, (post, summary) in enumerate(zip(posts, summaries), start=1):
         block = (
@@ -24,12 +18,11 @@ def format_digest(category: str, posts: list, emoji: str) -> str | None:
             f'<a href="{post["url"]}">Читати пост</a>\n'
             f'— — —'
         )
-
-        if total_length + len(block) > MAX_MESSAGE_LENGTH:
+        block_len = len(block)
+        if total_length + block_len > 4096:
             logger.warning(f"✂️ Дайджест '{category}' досяг ліміту символів. Зупинка на {i} постах.")
             break
-
         result.append(block)
-        total_length += len(block)
+        total_length += block_len
 
     return "\n".join(result)

@@ -22,7 +22,7 @@ class DigestThread:
             logger.warning(f"✂️ Зрізано {len(posts) - MAX_POSTS_PER_REQUEST} постів через ліміт prompt")
             posts = posts[:MAX_POSTS_PER_REQUEST]
 
-        digest = format_digest(self.category, posts, self.emoji)
+        digest = await format_digest(self.category, posts, self.emoji)
 
         if digest:
             send_message(digest)
