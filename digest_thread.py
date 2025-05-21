@@ -1,10 +1,10 @@
 from fetcher import fetch_posts_for_channels
 from formatter import format_digest
 from poster import send_message
-from config import GROUP_EMOJIS
+from config import GROUP_EMOJIS, MAX_POSTS_PER_REQUEST
 from logger import logger
 
-MAX_POSTS_PER_REQUEST = 20  # обмеження для уникнення 413
+  # обмеження для уникнення 413
 
 class DigestThread:
     def __init__(self, category: str, channels: list):

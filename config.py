@@ -12,8 +12,12 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # === LLM Settings ===
 DEFAULT_MODEL = "mistral-saba-24b"
-FALLBACK_MODEL = "mixtral-8x7b-32768"
+FALLBACK_MODEL = "llama3-8b-8192"
 MAX_RETRIES = 3
+
+# === LLM Limits ===
+MAX_PARALLEL_THREADS = 2
+MAX_POSTS_PER_REQUEST = 20
 
 # === Канали, згруповані по категоріях ===
 channel_groups = {

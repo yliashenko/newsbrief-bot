@@ -14,7 +14,7 @@ def format_digest(category: str, posts: list, emoji: str) -> str | None:
 
     summaries = summarize_texts(posts)
 
-    result = [f"📚 Зведення по темі: <b>{category}</b>"]
+    result = [f"📚 Зведення по темі: <b>{category.capitalize}</b>"]
     total_length = len(result[0]) + 2  # початковий заголовок + запас
 
     for i, (post, summary) in enumerate(zip(posts, summaries), start=1):

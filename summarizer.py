@@ -1,4 +1,5 @@
-import requests
+import aiohttp
+import asyncio
 import time
 from config import GROQ_API_KEY, DEFAULT_MODEL, FALLBACK_MODEL, MAX_RETRIES
 from logger import logger
@@ -8,12 +9,8 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-def summarize_texts(posts: list, model: str = DEFAULT_MODEL, attempt=1) -> list:
-    """
-    Генерує список саммарі для кожного поста.
-    Підтримує fallback-модель та retry-механізм.
-    """
-    texts = [post["text"] for post in posts if post.get("text")]
+async def summarize_texts(posts: list, model: str = DEFAULT_MODEL, attempt=1) -> list:
+    texts = [post["text"][:1000] for post in posts if post.get("text")]
     if not texts:
         logger.warning("📭 У постах немає тексту")
         return [{"title": "❌ Немає тексту", "summary": "Пост порожній або недоступний"}]
@@ -22,18 +19,29 @@ def summarize_texts(posts: list, model: str = DEFAULT_MODEL, attempt=1) -> list:
     payload = {
         "model": model,
         "messages": [
-            {"role": "system", "content": "Стисло підсумуй кожен із наведених постів. Додай заголовок і короткий опис."},
+            {"role": "system", "content": "Ти висококлассний редактор відомого медіа. Стисло підсумуй кожен із наведених постів. Додай заголовок і короткий опис. Укранською мовою"},
             {"role": "user", "content": prompt}
         ]
     }
 
     try:
+        await asyncio.sleep(1.5)  # rate limit protection
         start_time = time.time()
-        response = requests.post("https://api.groq.com/openai/v1/chat/completions", headers=HEADERS, json=payload)
-        duration = time.time() - start_time
+        async with aiohttp.ClientSession() as session:
+            async with session.post(
+                "https://api.groq.com/openai/v1/chat/completions",
+                headers=HEADERS,
+                json=payload
+            ) as response:
+                duration = time.time() - start_time
+                if response.status != 200:
+                    raise aiohttp.ClientResponseError(
+                        status=response.status,
+                        message=await response.text()
+                    )
+                data = await response.json()
 
-        response.raise_for_status()
-        result = response.json()["choices"][0]["message"]["content"]
+        result = data["choices"][0]["message"]["content"]
         logger.info(f"✅ Groq відповідь ({model}) за {duration:.2f}с")
         return parse_summaries(result, len(texts))
 
@@ -41,12 +49,12 @@ def summarize_texts(posts: list, model: str = DEFAULT_MODEL, attempt=1) -> list:
         logger.warning(f"⚠️ [Спроба {attempt}] Groq помилка для моделі {model}: {e}")
 
         if attempt < MAX_RETRIES:
-            time.sleep(2 * attempt)  # експоненціальна затримка
-            return summarize_texts(posts, model=model, attempt=attempt + 1)
+            await asyncio.sleep(2 * attempt)
+            return await summarize_texts(posts, model=model, attempt=attempt + 1)
 
         elif model != FALLBACK_MODEL:
             logger.warning(f"🔁 Переходимо на fallback-модель: {FALLBACK_MODEL}")
-            return summarize_texts(posts, model=FALLBACK_MODEL, attempt=1)
+            return await summarize_texts(posts, model=FALLBACK_MODEL, attempt=1)
 
         else:
             logger.error("❌ Не вдалося згенерувати саммарі навіть з fallback-моделлю.")
@@ -56,9 +64,6 @@ def build_prompt(texts: list) -> str:
     return "\n\n".join([f"{i+1}. {text.strip()}" for i, text in enumerate(texts)])
 
 def parse_summaries(response_text: str, expected_count: int) -> list:
-    """
-    Спліт тексту від LLM на окремі блоки з заголовком і саммарі.
-    """
     summaries = response_text.strip().split("\n\n")
     parsed = []
 

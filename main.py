@@ -1,11 +1,10 @@
 import asyncio
-from config import channel_groups
+from config import channel_groups, MAX_PARALLEL_THREADS
 from digest_thread import DigestThread
 from telegram_client import start_client
 from cache import init_db
 from logger import logger
 
-MAX_PARALLEL_THREADS = 2
 semaphore = asyncio.Semaphore(MAX_PARALLEL_THREADS)
 
 async def run_thread_with_limit(thread: DigestThread):
