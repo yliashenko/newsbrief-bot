@@ -9,6 +9,7 @@ async def summarize_texts(posts: list, model: str = DEFAULT_MODEL) -> list:
         return [{"title": "⚠️ Немає постів", "summary": "Не було знайдено нових повідомлень для аналізу."}]
 
     texts = [sanitize_post_text(p["text"]) for p in posts if p.get("text")]
+    texts = texts[:15]
     prompt = build_prompt(texts)
     response_text = await call_llm(prompt, model=model)
 

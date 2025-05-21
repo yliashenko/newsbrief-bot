@@ -4,17 +4,24 @@ def parse_summaries(response_text: str, expected_count: int) -> list:
 
     for s in summaries:
         lines = s.strip().split("\n", 1)
-        title = lines[0].strip() if lines[0].strip() else "Без назви"
-        summary = (
-            lines[1].strip() if len(lines) > 1 and lines[1].strip()
-            else "⚠️ LLM не повернула опис для цього поста."
-        )
-        parsed.append({"title": title, "summary": summary})
+        title = lines[0].strip() if lines else ""
+        summary = lines[1].strip() if len(lines) > 1 else ""
+
+        if not title and not summary:
+            parsed.append({
+                "title": "❌",
+                "summary": "LLM не повернула відповідь. Можливі причини: rate limit або надто великий prompt."
+            })
+        else:
+            parsed.append({
+                "title": title,
+                "summary": summary
+            })
 
     while len(parsed) < expected_count:
         parsed.append({
-            "title": "❌ Пропущено",
-            "summary": "LLM не повернула саммарі."
+            "title": "❌",
+            "summary": "LLM не повернула відповідь."
         })
 
     return parsed[:expected_count]

@@ -1,6 +1,6 @@
 import asyncio
 from digest.digest_thread import DigestThread
-from config import channel_groups, MAX_CONCURRENT_THREADS
+from config import channel_groups
 from shared.logger import logger
 from bot.formatter import format_digest
 from bot.poster import send_html_message
@@ -8,17 +8,10 @@ from bot.telegram_client import client
 from bot.cache import init_db
 
 llm_queue = asyncio.Queue()
-semaphore = asyncio.Semaphore(MAX_CONCURRENT_THREADS)
 
 async def run_digest_threads():
-    tasks = []
     for category, channels in channel_groups.items():
         thread = DigestThread(category, channels, llm_queue)
-        tasks.append(run_thread_with_limit(thread))
-    await asyncio.gather(*tasks)
-
-async def run_thread_with_limit(thread):
-    async with semaphore:
         await thread.run()
 
 async def llm_worker():
