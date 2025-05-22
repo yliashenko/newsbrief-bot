@@ -38,10 +38,20 @@ async def llm_worker():
 async def main():
     logger.info("🚀 Starting asynchronous digest processing")
     await client.connect()
+
+    # Запускаємо llm_worker як окрему задачу
     worker_task = asyncio.create_task(llm_worker())
+
+    # Запускаємо всі digest-потоки
     await run_digest_threads()
+
+    # Логуємо кількість задач у черзі
     logger.info(f"🧪 Розмір черги після run_digest_threads: {llm_queue.qsize()}")
+
+    # Очікуємо, поки черга буде повністю оброблена
     await llm_queue.join()
+
+    # Завершуємо воркер
     worker_task.cancel()
 
 if __name__ == "__main__":
