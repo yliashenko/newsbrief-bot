@@ -37,6 +37,7 @@ async def main():
     await client.connect()
     worker_task = asyncio.create_task(llm_worker())
     await run_digest_threads()
+    logger.info(f"🧪 Розмір черги після run_digest_threads: {llm_queue.qsize()}")
     await llm_queue.join()
     worker_task.cancel()
 
