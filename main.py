@@ -20,6 +20,7 @@ async def llm_worker():
         category = task["category"]
         posts = task["posts"]
         emoji = task["emoji"]
+        logger.info(f"🎯 llm_worker отримав задачу: {category} ({len(posts)} постів)")
 
         digest = await format_digest(category, posts, emoji)
 

@@ -9,6 +9,8 @@ async def format_digest(category: str, posts: list[TelegramPost], emoji: str) ->
         logger.warning(f"🔕 Пропущено категорію '{category}' — постів немає.")
         return ""
 
+    logger.info(f"🌀 Починається обробка {len(posts)} постів у категорії {category}")
+
     summaries: list[SummaryEntry] = []
     for post in posts:
 
