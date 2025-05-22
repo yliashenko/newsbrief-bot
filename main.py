@@ -16,21 +16,24 @@ async def run_digest_threads():
 
 async def llm_worker():
     while True:
-        task = await llm_queue.get()
-        category = task["category"]
-        posts = task["posts"]
-        emoji = task["emoji"]
-        logger.info(f"🎯 llm_worker отримав задачу: {category} ({len(posts)} постів)")
+        try:
+            task = await llm_queue.get()
+            category = task["category"]
+            posts = task["posts"]
+            emoji = task["emoji"]
+            logger.info(f"🎯 llm_worker отримав задачу: {category} ({len(posts)} постів)")
 
-        digest = await format_digest(category, posts, emoji)
+            digest = await format_digest(category, posts, emoji)
 
-        if digest:
-            send_html_message(digest)
-            logger.info(f"📬 Дайджест для '{category}' надіслано")
-        else:
-            logger.info(f"⏭️ Категорія '{category}' не відправлена (немає контенту або перевищено ліміт)")
+            if digest:
+                send_html_message(digest)
+                logger.info(f"📬 Дайджест для '{category}' надіслано")
+            else:
+                logger.info(f"⏭️ Категорія '{category}' не відправлена (немає контенту або перевищено ліміт)")
 
-        llm_queue.task_done()
+            llm_queue.task_done()
+        except Exception as e:
+            logger.exception(f"💥 Помилка в llm_worker: {e}")
 
 async def main():
     logger.info("🚀 Starting asynchronous digest processing")
