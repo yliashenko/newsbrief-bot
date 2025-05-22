@@ -22,12 +22,12 @@ async def call_llm(prompt: str, model: str = DEFAULT_MODEL, attempt=1) -> str:
         await asyncio.sleep(1.5)
         start_time = time.time()
         async with aiohttp.ClientSession() as session:
-            async with session.post(
+            async with asyncio.wait_for(session.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers=HEADERS,
                 json=payload,
                 timeout=aiohttp.ClientTimeout(total=15)
-            ) as response:
+            ), timeout=30) as response:
                 duration = time.time() - start_time
                 if response.status != 200:
                     error_text = await response.text()
@@ -36,6 +36,18 @@ async def call_llm(prompt: str, model: str = DEFAULT_MODEL, attempt=1) -> str:
 
         logger.info(f"✅ Groq відповідь ({model}) за {duration:.2f}с")
         return data["choices"][0]["message"]["content"]
+
+    except asyncio.TimeoutError:
+        logger.warning(f"⏳ [Спроба {attempt}] Таймаут очікування відповіді від LLM.")
+        if attempt < MAX_RETRIES:
+            await asyncio.sleep(2 * attempt)
+            return await call_llm(prompt, model=model, attempt=attempt + 1)
+        elif model != FALLBACK_MODEL:
+            logger.warning(f"🔁 Переходимо на fallback-модель: {FALLBACK_MODEL}")
+            return await call_llm(prompt, model=FALLBACK_MODEL, attempt=1)
+        else:
+            logger.error("❌ Не вдалося згенерувати відповідь навіть з fallback-моделлю.")
+            return "❌ Помилка. Таймаут запиту до LLM."
 
     except Exception as e:
         logger.warning(f"⚠️ [Спроба {attempt}] Groq помилка для моделі {model}: {e}")

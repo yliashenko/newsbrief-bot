@@ -11,7 +11,11 @@ async def format_digest(category: str, posts: list[TelegramPost], emoji: str) ->
 
     summaries: list[SummaryEntry] = []
     for post in posts:
+
+        logger.info(f"🔄 summarize_text start: {post['channel']}/{post['id']}")
         summary = await summarize_text(post)
+        logger.info(f"✅ summarize_text done: {post['channel']}/{post['id']}")
+        
         if summary is None:
             summary = {"title": "", "summary": ""}
         summaries.append(summary)
