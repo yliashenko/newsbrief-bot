@@ -16,7 +16,7 @@ async def summarize_post(post: dict, model: str = DEFAULT_MODEL) -> dict:
     parsed = parse_summaries(response, expected_count=1)
     return parsed[0] if parsed else {"title": "❌", "summary": "Не вдалося розпарсити."}
 
-async def summarize_texts(posts: list, model: str = DEFAULT_MODEL) -> list:
+async def summarize_text(posts: list, model: str = DEFAULT_MODEL) -> list:
     if not posts:
         return [{"title": "⚠️ Немає постів", "summary": "Не було знайдено нових повідомлень для аналізу."}]
     semaphore = asyncio.Semaphore(5)
