@@ -48,7 +48,7 @@ def format_title(category: str, emoji: str) -> str:
 
 def format_entry(index: int, title: str, summary: str, url: str) -> str:
     return (
-        f"<b>{POST_ENTRY_EMOJI} {title}</b>"
+        f"<b>{POST_ENTRY_EMOJI} {title}</b>\n"
         f"{summary}"
         f'<a href="{url}">Читати пост →</a>\n'
     )
