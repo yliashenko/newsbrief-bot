@@ -1,6 +1,6 @@
 from config import POST_ENTRY_EMOJI
 from shared.types import TelegramPost, SummaryEntry
-from summarizer.summarizer import summarize_texts
+from summarizer.summarizer import summarize_text
 from shared.logger import logger
 import re
 
@@ -9,7 +9,12 @@ async def format_digest(category: str, posts: list[TelegramPost], emoji: str) ->
         logger.warning(f"🔕 Пропущено категорію '{category}' — постів немає.")
         return ""
 
-    summaries: list[SummaryEntry] = await summarize_texts(posts)
+    summaries: list[SummaryEntry] = []
+    for post in posts:
+        summary = await summarize_text(post)
+        if summary is None:
+            summary = {"title": "", "summary": ""}
+        summaries.append(summary)
 
     result = [format_title(category, emoji)]
     total_length = len(result[0])
