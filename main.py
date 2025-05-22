@@ -15,7 +15,7 @@ async def run_digest_threads():
         await thread.run()
 
 async def llm_worker():
-    while not llm_queue.empty():
+    while True:
         task = await llm_queue.get()
         category = task["category"]
         posts = task["posts"]
@@ -34,10 +34,10 @@ async def llm_worker():
 async def main():
     logger.info("🚀 Starting asynchronous digest processing")
     await client.connect()
-    await asyncio.gather(
-        run_digest_threads(),
-        llm_worker()
-    )
+    worker_task = asyncio.create_task(llm_worker())
+    await run_digest_threads()
+    await llm_queue.join()
+    worker_task.cancel()
 
 if __name__ == "__main__":
     init_db()
