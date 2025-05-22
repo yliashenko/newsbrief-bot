@@ -33,32 +33,6 @@ SYSTEM_PROMPT = (
     "🔒 Відповідай виключно українською мовою незалежно від мови постів.\n"
 )
 
-# === Канали, згруповані по категоріях ===
-channel_groups = {
-    "ai": [
-        "@denissexy",
-        "@imatrofAI",
-        "@seeallochnaya",
-        "@ppprompt",
-    ],
-    "intresting": [
-        "@spekamedia",
-        "@iSIGHTmedia",
-        "@wallstreetukr",
-        "@MichaelPatsan",
-        "@theworldisnoteasy",
-        "@keddr",
-        "@prostirspokoy",
-    ],
-    "crypto": [
-        "@crypto_rostik",
-    ],
-    "politics": [
-        "@OstanniyCapitalist",
-        "@resurgammmm",
-    ]
-}
-
 GROUP_EMOJIS = {
     "ai": "🤖",
     "intresting": "🔍",
@@ -67,3 +41,5 @@ GROUP_EMOJIS = {
 }
 
 POST_ENTRY_EMOJI = "📌"
+
+CHANNEL_GROUPS = "channel_groups.json"

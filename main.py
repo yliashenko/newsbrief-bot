@@ -1,16 +1,24 @@
 import asyncio
 from digest.digest_thread import DigestThread
-from config import channel_groups
+from config import CHANNEL_GROUPS
 from shared.logger import logger
 from bot.formatter import format_digest
 from bot.poster import send_html_message
 from bot.telegram_client import client
 from bot.cache import init_db
+from chat_bot_ui.bot_handlers import router
+
+from aiogram import Bot, Dispatcher
+from config import BOT_TOKEN
+
+bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
+dp = Dispatcher()
+dp.include_router(router)
 
 llm_queue = asyncio.Queue()
 
 async def run_digest_threads():
-    for category, channels in channel_groups.items():
+    for category, channels in CHANNEL_GROUPS.items():
         thread = DigestThread(category, channels, llm_queue)
         await thread.run()
 
@@ -35,24 +43,31 @@ async def llm_worker():
         except Exception as e:
             logger.exception(f"💥 Помилка в llm_worker: {e}")
 
+import asyncio
+from aiogram import asyncio as aiogram_asyncio
+
+async def start_bot():
+    await dp.start_polling(bot)
+
+# запуск одночасно бота і дайджесту
 async def main():
     logger.info("🚀 Starting asynchronous digest processing")
     await client.connect()
 
-    # Запускаємо llm_worker як окрему задачу
+    # llm_worker
     worker_task = asyncio.create_task(llm_worker())
 
-    # Запускаємо всі digest-потоки
-    await run_digest_threads()
+    # дайджести
+    digest_task = asyncio.create_task(run_digest_threads())
 
-    # Логуємо кількість задач у черзі
+    # стартуємо бота
+    bot_task = asyncio.create_task(start_bot())
+
+    await digest_task
     logger.info(f"🧪 Розмір черги після run_digest_threads: {llm_queue.qsize()}")
-
-    # Очікуємо, поки черга буде повністю оброблена
     await llm_queue.join()
-
-    # Завершуємо воркер
     worker_task.cancel()
+    bot_task.cancel()
 
 if __name__ == "__main__":
     init_db()
