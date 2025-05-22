@@ -19,11 +19,10 @@ class DigestThread:
                 logger.warning(f"✂️ Зрізано {len(posts) - MAX_POSTS_PER_REQUEST} постів через ліміт prompt")
                 posts = posts[:MAX_POSTS_PER_REQUEST]
 
-            for post in posts:
-                await self.llm_queue.put({
-                    "category": self.category,
-                    "post": post,
-                    "emoji": self.emoji
-                })
+            await self.llm_queue.put({
+                "category": self.category,
+                "posts": posts,
+                "emoji": self.emoji
+            })
         except Exception as e:
             logger.error(f"🔥 [{self.category}] Помилка у DigestThread: {e}")
