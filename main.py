@@ -8,6 +8,7 @@ from bot.poster import send_html_message
 from bot.telegram_client import client
 from bot.cache import init_db
 from chat_bot_ui.bot_handlers import router
+from chat_bot_ui.bot_menu import menu_router
 
 from aiogram import Bot, Dispatcher
 from config import BOT_TOKEN
@@ -15,6 +16,7 @@ from config import BOT_TOKEN
 bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
 dp = Dispatcher()
 dp.include_router(router)
+dp.include_router(menu_router)
 
 llm_queue = asyncio.Queue()
 
