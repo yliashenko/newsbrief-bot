@@ -7,18 +7,6 @@ from bot.formatter import format_digest
 from bot.poster import send_html_message
 from bot.telegram_client import client
 from bot.cache import init_db
-from chat_bot_ui.bot_handlers import router
-from chat_bot_ui.bot_menu import menu_router
-
-from aiogram import Bot, Dispatcher
-from aiogram.fsm.storage.memory import MemoryStorage
-from config import BOT_TOKEN
-
-bot = Bot(token=BOT_TOKEN, parse_mode="HTML")
-storage = MemoryStorage()
-dp = Dispatcher(storage=storage)
-dp.include_router(router)
-dp.include_router(menu_router)
 
 llm_queue = asyncio.Queue()
 
@@ -51,28 +39,17 @@ async def llm_worker():
         except Exception as e:
             logger.exception(f"💥 Помилка в llm_worker: {e}")
 
-async def start_bot():
-    await dp.start_polling(bot)
-
-# запуск одночасно бота і дайджесту
 async def main():
     logger.info("🚀 Starting asynchronous digest processing")
     await client.connect()
 
-    # llm_worker
     worker_task = asyncio.create_task(llm_worker())
-
-    # дайджести
     digest_task = asyncio.create_task(run_digest_threads())
-
-    # стартуємо бота
-    bot_task = asyncio.create_task(start_bot())
 
     await digest_task
     logger.info(f"🧪 Розмір черги після run_digest_threads: {llm_queue.qsize()}")
     await llm_queue.join()
     worker_task.cancel()
-    bot_task.cancel()
 
 if __name__ == "__main__":
     init_db()
