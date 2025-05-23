@@ -8,7 +8,8 @@ from config import CHANNEL_GROUPS
 menu_router = Router()
 
 @menu_router.message(F.text == "/start")
-async def cmd_start(message: types.Message):
+async def cmd_start(message: types.Message, state: FSMContext):
+    await state.clear()
     keyboard = ReplyKeyboardMarkup(
         keyboard=[
             [KeyboardButton(text="📌 Додати канал")],
