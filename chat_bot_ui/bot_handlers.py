@@ -22,7 +22,7 @@ class AddChannelStates(StatesGroup):
     entering_channel = State()
 
 # /addchannel
-@router.message(F.text == "/addchannel")
+@router.message(F.text.in_({"/addchannel", "📌 Додати канал"}))
 async def cmd_addchannel(message: types.Message, state: FSMContext):
     groups = list(load_channel_groups().keys())
     keyboard = types.ReplyKeyboardMarkup(

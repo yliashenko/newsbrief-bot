@@ -10,13 +10,19 @@ menu_router = Router()
 @menu_router.message(F.text == "/start")
 async def cmd_start(message: types.Message, state: FSMContext):
     await state.clear()
+    keyboard_buttons = [
+        [KeyboardButton(text="📌 Додати канал")],
+        [KeyboardButton(text="📬 Згенерувати дайджест")],
+        [KeyboardButton(text="📋 Список каналів")],
+    ]
+
+    # Перевіряємо чи є активний стан FSM, якщо є — додаємо кнопку повернення
+    state_data = await state.get_state()
+    if state_data is not None:
+        keyboard_buttons.append([KeyboardButton(text="🔄 Повернутись до меню")])
+
     keyboard = ReplyKeyboardMarkup(
-        keyboard=[
-            [KeyboardButton(text="📌 Додати канал")],
-            [KeyboardButton(text="📬 Згенерувати дайджест")],
-            [KeyboardButton(text="📋 Список каналів")],
-            [KeyboardButton(text="🔄 Повернутись до меню")],
-        ],
+        keyboard=keyboard_buttons,
         resize_keyboard=True,
         one_time_keyboard=False
     )
