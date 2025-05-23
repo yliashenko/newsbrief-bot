@@ -43,9 +43,6 @@ async def llm_worker():
         except Exception as e:
             logger.exception(f"💥 Помилка в llm_worker: {e}")
 
-import asyncio
-from aiogram import asyncio as aiogram_asyncio
-
 async def start_bot():
     await dp.start_polling(bot)
 
