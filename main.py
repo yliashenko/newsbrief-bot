@@ -1,6 +1,7 @@
 import asyncio
 from digest.digest_thread import DigestThread
-from config import CHANNEL_GROUPS
+import json
+from config import CHANNEL_GROUPS as CHANNEL_GROUPS_PATH
 from shared.logger import logger
 from bot.formatter import format_digest
 from bot.poster import send_html_message
@@ -18,7 +19,10 @@ dp.include_router(router)
 llm_queue = asyncio.Queue()
 
 async def run_digest_threads():
-    for category, channels in CHANNEL_GROUPS.items():
+    with open(CHANNEL_GROUPS_PATH, "r", encoding="utf-8") as f:
+        groups = json.load(f)
+
+    for category, channels in groups.items():
         thread = DigestThread(category, channels, llm_queue)
         await thread.run()
 
