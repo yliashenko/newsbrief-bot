@@ -1,5 +1,3 @@
-# bot_handlers.py
-
 import json
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext

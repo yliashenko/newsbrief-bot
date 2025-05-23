@@ -1,7 +1,7 @@
 from aiogram import Router, types, F
 from aiogram.types import ReplyKeyboardMarkup, KeyboardButton
 from aiogram.fsm.context import FSMContext
-from bot_handlers import cmd_addchannel
+from chat_bot_ui.bot_handlers import cmd_addchannel
 import json
 from config import CHANNEL_GROUPS
 
