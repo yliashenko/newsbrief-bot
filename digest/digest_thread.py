@@ -11,30 +11,44 @@ class DigestThread:
         self.llm_queue = llm_queue
         self.post_cache = post_cache
 
+    from config import MIN_POST_LENGTH
+
     async def run(self):
         try:
             logger.info(f"▶️ Старт потоку: {self.category}")
             posts = await fetch_posts_for_channels(self.channels, self.post_cache)
             logger.info(f"📦 Отримано {len(posts)} постів у потоці '{self.category}'")
 
-            # 🔍 Фільтрація постів, які вже були оброблені
             filtered_posts = []
+            skipped_posts = []  # 👈 масив для зібраних причин
+
             for post in posts:
                 text = post.get("text", "").strip()
                 channel = post["channel"]
                 message_id = post["id"]
 
                 if len(text) < MIN_POST_LENGTH:
-                    logger.debug(f"📉 Пропущено пост {channel}/{message_id} (менше {MIN_POST_LENGTH} символів)")
+                    skipped_posts.append({
+                        "channel": channel,
+                        "id": message_id,
+                        "reason": "short",
+                        "length": len(text)
+                    })
                     continue
 
-                if not self.post_cache.is_cached(channel, message_id):
-                    filtered_posts.append(post)
-                    self.post_cache.add(channel, message_id)
-                else:
-                    logger.debug(f"⏭️ Пропущено пост {channel}/{message_id} (вже в кеші)")
+                if self.post_cache.is_cached(channel, message_id):
+                    skipped_posts.append({
+                        "channel": channel,
+                        "id": message_id,
+                        "reason": "cached"
+                    })
+                    continue
+
+                filtered_posts.append(post)
+                self.post_cache.add(channel, message_id)
 
             logger.info(f"✅ Нових постів для '{self.category}': {len(filtered_posts)}")
+            logger.debug(f"🧹 Відфільтровано {len(skipped_posts)} постів у '{self.category}': {skipped_posts}")
 
             if len(filtered_posts) > MAX_POSTS_PER_REQUEST:
                 logger.warning(f"✂️ Зрізано {len(filtered_posts) - MAX_POSTS_PER_REQUEST} постів через ліміт prompt")
@@ -48,5 +62,6 @@ class DigestThread:
                 })
             else:
                 logger.info(f"📭 У потоці '{self.category}' немає нових постів для обробки")
+
         except Exception as e:
             logger.error(f"🔥 [{self.category}] Помилка у DigestThread: {e}")
