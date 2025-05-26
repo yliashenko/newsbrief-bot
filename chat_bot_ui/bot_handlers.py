@@ -2,8 +2,8 @@ import json
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
 from aiogram.fsm.state import State, StatesGroup
-
 from config import CHANNEL_GROUPS
+from main import run_digest_threads
 
 router = Router()
 
@@ -66,3 +66,10 @@ async def process_channel_entry(message: types.Message, state: FSMContext):
         await message.answer(f"✅ Канал {nickname} додано до потоку {group}.")
 
     await state.clear()
+
+# /digest — ручний запуск дайджесту
+@router.message(F.text.in_({"/digest", "🧠 Згенерувати дайджест"}))
+async def cmd_digest(message: types.Message):
+    await message.answer("📡 Починаю формувати дайджест. Це займе кілька секунд...")
+    await run_digest_threads()
+    await message.answer("✅ Дайджест згенеровано за запитом.")

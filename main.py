@@ -1,21 +1,22 @@
 import asyncio
-from digest.digest_thread import DigestThread
 import json
-from config import CHANNEL_GROUPS as CHANNEL_GROUPS_PATH
+from config import CHANNEL_GROUPS_PATH
 from shared.logger import logger
 from bot.formatter import format_digest
 from bot.poster import send_html_message
 from bot.telegram_client import client
-from bot.cache import init_db
+from bot.cache import init_db, PostCache
+from digest.digest_thread import DigestThread
 
 llm_queue = asyncio.Queue()
+post_cache = PostCache()
 
 async def run_digest_threads():
     with open(CHANNEL_GROUPS_PATH, "r", encoding="utf-8") as f:
         groups = json.load(f)
 
     for category, channels in groups.items():
-        thread = DigestThread(category, channels, llm_queue)
+        thread = DigestThread(category, channels, llm_queue, post_cache)
         await thread.run()
 
 async def llm_worker():
@@ -50,6 +51,8 @@ async def main():
     logger.info(f"🧪 Розмір черги після run_digest_threads: {llm_queue.qsize()}")
     await llm_queue.join()
     worker_task.cancel()
+
+    post_cache.save()
 
 if __name__ == "__main__":
     init_db()
