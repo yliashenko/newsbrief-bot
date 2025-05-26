@@ -48,8 +48,8 @@ class DigestThread:
                 self.post_cache.add(channel, message_id)
 
             logger.info(f"✅ Нових постів для '{self.category}': {len(filtered_posts)}")
+            logger.info(f"🧹 Всього відфільтровано {len(skipped_posts)} постів у '{self.category}'")
             if skipped_posts:
-                logger.info(f"🧹 Відфільтровано {len(skipped_posts)} постів у '{self.category}':")
                 for skipped in skipped_posts:
                     if skipped["reason"] == "short":
                         logger.info(f"   ⛔ {skipped['channel']}/{skipped['id']} — короткий ({skipped['length']} симв.)")
