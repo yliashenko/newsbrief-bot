@@ -44,7 +44,7 @@ async def format_digest(category: str, posts: list[TelegramPost], emoji: str) ->
     return "\n".join(result)
 
 def format_title(category: str, emoji: str) -> str:
-    return f"Що нового: <b>{category.upper()} {emoji}</b>\n"
+    return f"<b>{category.upper()} {emoji}</b>\n"
 
 def format_entry(index: int, title: str, summary: str, url: str) -> str:
     return (

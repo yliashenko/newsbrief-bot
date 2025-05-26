@@ -43,5 +43,5 @@ async def send_digest_banner(category: str):
         return
 
     image = FSInputFile(image_path)
-    caption = f"Що нового в: {category.upper()}"
+    caption = f"<b>Що нового в: {category.upper()}</b>"
     await bot.send_photo(chat_id=CHAT_ID, photo=image, caption=caption)
