@@ -48,7 +48,13 @@ class DigestThread:
                 self.post_cache.add(channel, message_id)
 
             logger.info(f"✅ Нових постів для '{self.category}': {len(filtered_posts)}")
-            logger.debug(f"🧹 Відфільтровано {len(skipped_posts)} постів у '{self.category}': {skipped_posts}")
+            if skipped_posts:
+                logger.info(f"🧹 Відфільтровано {len(skipped_posts)} постів у '{self.category}':")
+                for skipped in skipped_posts:
+                    if skipped["reason"] == "short":
+                        logger.info(f"   ⛔ {skipped['channel']}/{skipped['id']} — короткий ({skipped['length']} симв.)")
+                    elif skipped["reason"] == "cached":
+                        logger.info(f"   ♻️ {skipped['channel']}/{skipped['id']} — вже в кеші")
 
             if len(filtered_posts) > MAX_POSTS_PER_REQUEST:
                 logger.warning(f"✂️ Зрізано {len(filtered_posts) - MAX_POSTS_PER_REQUEST} постів через ліміт prompt")
