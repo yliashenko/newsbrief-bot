@@ -41,14 +41,12 @@ async def llm_worker():
             logger.exception(f"💥 Помилка в llm_worker: {e}")
 
 async def main():
-    logger.info("🚀 Starting asynchronous digest processing")
     await client.connect()
 
     worker_task = asyncio.create_task(llm_worker())
     digest_task = asyncio.create_task(run_digest_threads())
 
     await digest_task
-    logger.info(f"🧪 Розмір черги після run_digest_threads: {llm_queue.qsize()}")
     await llm_queue.join()
     worker_task.cancel()
 
@@ -56,5 +54,4 @@ async def main():
 
 if __name__ == "__main__":
     init_db()
-    logger.info("🐣 main.py launched")
     asyncio.run(main())

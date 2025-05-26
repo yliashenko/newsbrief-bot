@@ -1,5 +1,5 @@
 from digest.fetcher import fetch_posts_for_channels 
-from config import GROUP_EMOJIS, MAX_POSTS_PER_REQUEST
+from config import GROUP_EMOJIS, MAX_POSTS_PER_REQUEST, MIN_POST_LENGTH
 from shared.logger import logger
 from bot.cache import PostCache  # 👈 додаємо
 
@@ -20,8 +20,14 @@ class DigestThread:
             # 🔍 Фільтрація постів, які вже були оброблені
             filtered_posts = []
             for post in posts:
-                channel = post["channel"]  # ✅
-                message_id = post["id"]    # ✅
+                text = post.get("text", "").strip()
+                channel = post["channel"]
+                message_id = post["id"]
+
+                if len(text) < MIN_POST_LENGTH:
+                    logger.debug(f"📉 Пропущено пост {channel}/{message_id} (менше {MIN_POST_LENGTH} символів)")
+                    continue
+
                 if not self.post_cache.is_cached(channel, message_id):
                     filtered_posts.append(post)
                     self.post_cache.add(channel, message_id)

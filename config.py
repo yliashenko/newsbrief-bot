@@ -21,6 +21,9 @@ MAX_PARALLEL_THREADS = 2
 MAX_CONCURRENT_THREADS = 2
 MAX_POSTS_PER_REQUEST = 10
 
+MIN_POST_LENGTH = 150
+MAX_POST_LENGTH = 1000
+
 SYSTEM_PROMPT = (
     "Ти — бот, що формує щоденні дайджести з Telegram-постів українською мовою. "
     "Твоє завдання — стиснути пост, зберігаючи ключову суть і настрій, у формат:\n"

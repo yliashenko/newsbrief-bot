@@ -1,7 +1,11 @@
 import re
 from html import unescape
+from config import MIN_POST_LENGTH, MAX_POST_LENGTH
 
-def sanitize_post_text(text: str, min_len: int = 150, max_len: int = 1000) -> str:
+def sanitize_post_text(
+        text: str, 
+        min_len: int = MIN_POST_LENGTH, 
+        max_len: int = MAX_POST_LENGTH) -> str:
     if not text:
         return ""
 
