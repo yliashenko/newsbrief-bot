@@ -1,9 +1,9 @@
 from bot.telegram_client import get_channel_posts
 from shared.logger import logger
-from bot.cache import is_seen, mark_seen
 from config import MAX_NEW_POSTS_PER_CHANNEL
+from bot.cache import PostCache  # ✅ новий клас кешу
 
-async def fetch_posts_for_channels(channels: list, limit: int = 20) -> list:
+async def fetch_posts_for_channels(channels: list, post_cache: PostCache, limit: int = 20) -> list:
     all_posts = []
 
     for channel in channels:
@@ -17,9 +17,9 @@ async def fetch_posts_for_channels(channels: list, limit: int = 20) -> list:
             new_posts = []
             for post in posts:
                 message_id = post.get("id")
-                if not is_seen(channel, message_id):
+                if not post_cache.is_cached(channel, message_id):
                     new_posts.append(post)
-                    mark_seen(channel, message_id)
+                    post_cache.add(channel, message_id)
                 else:
                     logger.debug(f"🔁 {channel} — вже бачили post #{message_id}")
 

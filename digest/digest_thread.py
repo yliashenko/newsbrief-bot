@@ -14,7 +14,7 @@ class DigestThread:
     async def run(self):
         try:
             logger.info(f"▶️ Старт потоку: {self.category}")
-            posts = await fetch_posts_for_channels(self.channels)
+            posts = await fetch_posts_for_channels(self.channels, self.post_cache)
             logger.info(f"📦 Отримано {len(posts)} постів у потоці '{self.category}'")
 
             # 🔍 Фільтрація постів, які вже були оброблені
