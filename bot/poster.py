@@ -1,3 +1,6 @@
+from aiogram.types import FSInputFile
+from config import STREAM_IMAGES
+from .bot_instance import bot
 import requests
 from config import CHAT_ID, BOT_TOKEN, MAX_RETRIES
 from shared.logger import logger
@@ -31,3 +34,14 @@ def send_html_message(html: str):
                 sleep(2 * attempt)
             else:
                 logger.error("❌ Повідомлення не надіслано навіть після повторних спроб.")
+
+
+# Async function to send a digest banner image for a category
+async def send_digest_banner(category: str):
+    image_path = STREAM_IMAGES.get(category)
+    if not image_path:
+        return
+
+    image = FSInputFile(image_path)
+    caption = f"Що нового в: {category.upper()}"
+    await bot.send_photo(chat_id=CHAT_ID, photo=image, caption=caption)

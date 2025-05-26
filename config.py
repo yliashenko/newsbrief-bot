@@ -47,3 +47,11 @@ GROUP_EMOJIS = {
 POST_ENTRY_EMOJI = "📌"
 
 CHANNEL_GROUPS = Path(__file__).parent / "channel_groups.json"
+
+# === Stream banner images ===
+STREAM_IMAGES = {
+    "ai": "assets/banners/ai.jpg",
+    "intresting": "assets/banners/media.jpg",
+    "crypto": "assets/banners/crypto.jpg",
+    "politics": "assets/banners/politics.jpg",
+}

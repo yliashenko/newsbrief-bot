@@ -4,6 +4,7 @@ from config import CHANNEL_GROUPS
 from shared.logger import logger
 from bot.formatter import format_digest
 from bot.poster import send_html_message
+from bot.poster import send_digest_banner
 from bot.telegram_client import client
 from bot.cache import init_db, PostCache
 from digest.digest_thread import DigestThread
@@ -31,6 +32,7 @@ async def llm_worker():
             digest = await format_digest(category, posts, emoji)
 
             if digest:
+                await send_digest_banner(category)
                 send_html_message(digest)
                 logger.info(f"📬 Дайджест для '{category}' надіслано")
             else:
