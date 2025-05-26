@@ -16,17 +16,5 @@ async def summarize_post(post: dict, model: str = DEFAULT_MODEL) -> dict:
     parsed = parse_summaries(response, expected_count=1)
     return parsed[0] if parsed else {"title": "❌", "summary": "Не вдалося розпарсити."}
 
-async def summarize_post_batch(posts: list, model: str = DEFAULT_MODEL) -> list:
-    if not posts:
-        return [{"title": "⚠️ Немає постів", "summary": "Не було знайдено нових повідомлень для аналізу."}]
-    semaphore = asyncio.Semaphore(5)
-
-    async def limited(post):
-        async with semaphore:
-            return await summarize_post(post, model)
-
-    posts = posts[:MAX_POSTS_PER_REQUEST]
-    return await asyncio.gather(*(limited(p) for p in posts))
-
 async def summarize_text(post: dict, model: str = DEFAULT_MODEL) -> dict:
     return await summarize_post(post, model=model)

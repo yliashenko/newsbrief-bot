@@ -20,8 +20,8 @@ class DigestThread:
             # 🔍 Фільтрація постів, які вже були оброблені
             filtered_posts = []
             for post in posts:
-                channel = post.channel.username
-                message_id = post.id
+                channel = post["channel"]  # ✅
+                message_id = post["id"]    # ✅
                 if not self.post_cache.is_cached(channel, message_id):
                     filtered_posts.append(post)
                     self.post_cache.add(channel, message_id)
