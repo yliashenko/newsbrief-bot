@@ -1,5 +1,6 @@
 import os
 from dotenv import load_dotenv
+from pathlib import Path
 
 load_dotenv()
 
@@ -42,4 +43,4 @@ GROUP_EMOJIS = {
 
 POST_ENTRY_EMOJI = "📌"
 
-CHANNEL_GROUPS = "channel_groups.json"
+CHANNEL_GROUPS = Path(__file__).parent / "channel_groups.json"
