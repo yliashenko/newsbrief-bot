@@ -12,8 +12,8 @@ CHAT_ID = os.getenv("CHAT_ID")
 GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # === Settings ===
-DEFAULT_MODEL = "mistral-saba-24b"
-FALLBACK_MODEL = "llama3-8b-8192"
+DEFAULT_MODEL = "llama3-70b-8192"
+FALLBACK_MODEL = "mixtral-8x22b"
 MAX_RETRIES = 3
 MAX_NEW_POSTS_PER_CHANNEL = 20
 

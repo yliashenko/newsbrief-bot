@@ -19,7 +19,6 @@ async def call_llm(prompt: str, model: str = DEFAULT_MODEL, attempt: int = 1) ->
     }
 
     try:
-        await asyncio.sleep(1.5)
         start_time = time.time()
         timeout = aiohttp.ClientTimeout(total=15)
         async with aiohttp.ClientSession(timeout=timeout) as session:
@@ -41,7 +40,6 @@ async def call_llm(prompt: str, model: str = DEFAULT_MODEL, attempt: int = 1) ->
     except asyncio.TimeoutError:
         logger.warning(f"⏳ [Спроба {attempt}] Таймаут очікування відповіді від LLM.")
         if attempt < MAX_RETRIES:
-            await asyncio.sleep(2 * attempt)
             return await call_llm(prompt, model=model, attempt=attempt + 1)
         elif model != FALLBACK_MODEL:
             logger.warning(f"🔁 Переходимо на fallback-модель: {FALLBACK_MODEL}")
@@ -54,7 +52,6 @@ async def call_llm(prompt: str, model: str = DEFAULT_MODEL, attempt: int = 1) ->
         logger.warning(f"⚠️ [Спроба {attempt}] Groq помилка для моделі {model}: {e}")
 
         if attempt < MAX_RETRIES:
-            await asyncio.sleep(2 * attempt)
             return await call_llm(prompt, model=model, attempt=attempt + 1)
 
         elif model != FALLBACK_MODEL:
