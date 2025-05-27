@@ -1,10 +1,10 @@
 from aiogram.types import FSInputFile
+from aiogram.exceptions import TelegramBadRequest
 from config import STREAM_IMAGES
 from .bot_instance import bot
 import requests
 from config import CHAT_ID, BOT_TOKEN, MAX_RETRIES
 from shared.logger import logger
-
 from time import sleep
 from loguru import logger
 
@@ -40,7 +40,12 @@ def send_html_message(html: str):
 async def send_digest_banner(category: str):
     image_path = STREAM_IMAGES.get(category)
     if not image_path:
+        logger.warning(f"🚫 Немає банера для категорії '{category}'")
         return
 
     image = FSInputFile(image_path)
-    await bot.send_photo(chat_id=CHAT_ID, photo=image)
+    try:
+        await bot.send_photo(chat_id=CHAT_ID, photo=image)
+        logger.info(f"✅ Банер для '{category}' надіслано")
+    except TelegramBadRequest as e:
+        logger.error(f"❌ Помилка надсилання банера для '{category}': {e}")
