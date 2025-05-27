@@ -5,14 +5,19 @@
     "@seeallochnaya",
     "@ppprompt"
   ],
-  "intresting": [
+  "media": [
     "@spekamedia",
     "@iSIGHTmedia",
     "@wallstreetukr",
-    "@MichaelPatsan",
-    "@theworldisnoteasy",
     "@keddr",
     "@prostirspokoy"
+  ],
+  "blogs": [
+    "@MichaelPatsan",
+    "@theworldisnoteasy",
+    "@prostirspokoy",
+    "@AnatoliyAmelin",
+    "@OGoMono"
   ],
   "crypto": [
     "@crypto_rostik"
