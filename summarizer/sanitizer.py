@@ -13,7 +13,7 @@ def sanitize_post_text(text: str) -> str | None:
     text = re.sub(r"<[^>]+>", "", text)          # Видалення HTML-тегів
     text = re.sub(r"http\S+", "", text)          # Видалення посилань
     text = re.sub(r"[@#]\w+", "", text)          # Видалення @mentions та #hashtags
-    text = text.replace("•", "")                 # Видалення маркерів списку
+    text = re.sub(r"[•▪︎◦●‣♦❖▶➤➥➔→➢➣➤➧➨➩➪➫➬➭➮➯]", "", text)  # Видалення маркерів списку
     text = re.sub(r"\s+", " ", text).strip()     # Обрізання зайвих пробілів
 
     return text
