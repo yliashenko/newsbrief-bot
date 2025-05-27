@@ -34,7 +34,7 @@ async def llm_worker() -> None:
 
             if digest:
                 await send_digest_banner(category)
-                send_html_message(digest)
+                await send_html_message(digest)
                 logger.info(f"📬 Дайджест для '{category}' надіслано")
             else:
                 logger.info(f"⏭️ Категорія '{category}' не відправлена (немає контенту або перевищено ліміт)")

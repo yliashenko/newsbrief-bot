@@ -9,7 +9,7 @@ from shared.logger import logger
 from time import sleep
 from loguru import logger
 
-def send_html_message(html: str) -> None:
+async def send_html_message(html: str) -> None:
     for attempt in range(1, MAX_RETRIES + 1):
         try:
             logger.debug(f"📤 HTML до Telegram:\n{html}")

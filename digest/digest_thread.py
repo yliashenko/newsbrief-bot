@@ -1,7 +1,7 @@
 from typing import Any
 from asyncio import Queue
 from digest.fetcher import fetch_posts_for_channels 
-from config import GROUP_EMOJIS, MAX_POSTS_PER_REQUEST, MIN_POST_LENGTH, MAX_POST_LENGTH
+from config import GROUP_EMOJIS, MIN_POST_LENGTH, MAX_POST_LENGTH
 from shared.logger import logger
 from bot.cache import PostCache  # 👈 додаємо
 
@@ -59,14 +59,13 @@ class DigestThread:
             for ch, msg_id in cached_posts:
                 logger.info(f"   ♻️ {ch}/{msg_id} — вже в кеші")
 
-            # 4. Передача кожного поста в LLM
+            # 4. Передача всіх постів в LLM одним повідомленням
             if final_posts:
-                for post in final_posts:
-                    await self.llm_queue.put({
-                        "category": self.category,
-                        "posts": [post],
-                        "emoji": self.emoji
-                    })
+                await self.llm_queue.put({
+                    "category": self.category,
+                    "posts": final_posts,
+                    "emoji": self.emoji
+                })
             else:
                 logger.info(f"📭 У потоці '{self.category}' немає нових постів для обробки")
 
