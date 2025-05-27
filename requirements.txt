@@ -5,3 +5,4 @@ openai==0.28.1
 requests==2.32.3
 loguru==0.7.2
 dotenv==0.9.9
+mypy>=1.0

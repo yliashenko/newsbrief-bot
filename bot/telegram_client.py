@@ -1,17 +1,18 @@
 from telethon import TelegramClient
+from telethon.tl.types import Channel
 from config import API_ID, API_HASH
 from shared.logger import logger
 
 client = TelegramClient("user_session", API_ID, API_HASH)
 
 # Стартуємо клієнт при запуску застосунку
-async def start_client():
+async def start_client() -> None:
     if not client.is_connected():
         await client.connect()
     if not await client.is_user_authorized():
         raise RuntimeError("❌ Телеграм клієнт не авторизований")
 
-async def get_channel_posts(channel_username: str, limit: int = 20) -> list:
+async def get_channel_posts(channel_username: str, limit: int = 20) -> list[dict[str, str | int]]:
     if not client.is_connected():
         await client.connect()
     try:
@@ -30,8 +31,13 @@ async def get_channel_posts(channel_username: str, limit: int = 20) -> list:
         return []
 
 async def get_channel_title(channel: str) -> str:
+    title: str
     try:
         entity = await client.get_entity(channel)
-        return entity.title
+        if isinstance(entity, Channel) and entity.title:
+            title = entity.title
+        else:
+            title = channel
     except Exception:
-        return channel
+        title = channel
+    return title

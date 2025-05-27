@@ -1,3 +1,4 @@
+from typing import Any, TYPE_CHECKING
 import asyncio
 import json
 from config import CHANNEL_GROUPS
@@ -9,10 +10,10 @@ from bot.telegram_client import client
 from bot.cache import init_db, PostCache
 from digest.digest_thread import DigestThread
 
-llm_queue = asyncio.Queue()
+llm_queue: asyncio.Queue[dict[str, Any]] = asyncio.Queue()
 post_cache = PostCache()
 
-async def run_digest_threads():
+async def run_digest_threads() -> None:
     with open(CHANNEL_GROUPS, "r", encoding="utf-8") as f:
         groups = json.load(f)
 
@@ -20,7 +21,7 @@ async def run_digest_threads():
         thread = DigestThread(category, channels, llm_queue, post_cache)
         await thread.run()
 
-async def llm_worker():
+async def llm_worker() -> None:
     while True:
         try:
             task = await llm_queue.get()
@@ -42,7 +43,7 @@ async def llm_worker():
         except Exception as e:
             logger.exception(f"💥 Помилка в llm_worker: {e}")
 
-async def main():
+async def main() -> None:
     await client.connect()
 
     worker_task = asyncio.create_task(llm_worker())

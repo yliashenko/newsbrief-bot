@@ -3,9 +3,10 @@ from summarizer.prompt_builder import build_prompt
 from summarizer.parser import parse_summaries
 from summarizer.llm_client import call_llm
 from summarizer.sanitizer import sanitize_post_text
+from shared.custom_types import TelegramPost, Summary
 import asyncio
 
-async def summarize_post(post: dict, model: str = DEFAULT_MODEL) -> dict:
+async def summarize_post(post: TelegramPost, model: str = DEFAULT_MODEL) -> Summary:
     text = sanitize_post_text(post.get("text", ""))
     if not text:
         return {"title": "❌", "summary": "Пост порожній або некоректний."}
@@ -16,5 +17,5 @@ async def summarize_post(post: dict, model: str = DEFAULT_MODEL) -> dict:
     parsed = parse_summaries(response, expected_count=1)
     return parsed[0] if parsed else {"title": "❌", "summary": "Не вдалося розпарсити."}
 
-async def summarize_text(post: dict, model: str = DEFAULT_MODEL) -> dict:
+async def summarize_text(post: TelegramPost, model: str = DEFAULT_MODEL) -> Summary:
     return await summarize_post(post, model=model)

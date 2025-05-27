@@ -8,3 +8,8 @@ class TelegramPost(TypedDict):
 class SummaryEntry(TypedDict):
     title: str
     summary: str
+
+class Summary(TypedDict):
+    title: str
+    summary: str
+

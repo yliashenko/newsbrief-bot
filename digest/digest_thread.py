@@ -1,74 +1,79 @@
+from typing import Any
+from asyncio import Queue
 from digest.fetcher import fetch_posts_for_channels 
-from config import GROUP_EMOJIS, MAX_POSTS_PER_REQUEST, MIN_POST_LENGTH
+from config import GROUP_EMOJIS, MAX_POSTS_PER_REQUEST, MIN_POST_LENGTH, MAX_POST_LENGTH
 from shared.logger import logger
 from bot.cache import PostCache  # 👈 додаємо
 
 class DigestThread:
-    def __init__(self, category: str, channels: list, llm_queue, post_cache: PostCache):
+    def __init__(self, category: str, channels: list[str], llm_queue: Queue[dict[str, Any]], post_cache: PostCache) -> None:
         self.category = category
         self.channels = channels
         self.emoji = GROUP_EMOJIS.get(category, "📝")
         self.llm_queue = llm_queue
         self.post_cache = post_cache
 
-    from config import MIN_POST_LENGTH
-
-    async def run(self):
+    async def run(self) -> None:
         try:
-            posts = await fetch_posts_for_channels(self.channels, self.post_cache)
+            # 1. Отримання постів з каналів
+            posts = await fetch_posts_for_channels(self.channels)
             logger.info(f"📦 Отримано {len(posts)} постів у потоці '{self.category}'")
 
-            filtered_posts = []
-            skipped_posts = []  # 👈 масив для зібраних причин
+            # Новий порядок фільтрації і логування
+            too_short_posts = []
+            too_long_posts = []
+            cached_posts = []
+            final_posts = []
 
+            # 2. Фільтрація постів за довжиною
             for post in posts:
                 text = post.get("text", "").strip()
                 channel = post["channel"]
                 message_id = post["id"]
+                length = len(text)
 
-                if len(text) < MIN_POST_LENGTH:
-                    skipped_posts.append({
-                        "channel": channel,
-                        "id": message_id,
-                        "reason": "short",
-                        "length": len(text)
-                    })
+                if length < MIN_POST_LENGTH:
+                    too_short_posts.append((channel, message_id, length))
                     continue
 
+                if length > MAX_POST_LENGTH:
+                    too_long_posts.append((channel, message_id, length))
+                    continue
+
+                # 3. Перевірка кешу
                 if self.post_cache.is_cached(channel, message_id):
-                    skipped_posts.append({
-                        "channel": channel,
-                        "id": message_id,
-                        "reason": "cached"
-                    })
+                    cached_posts.append((channel, message_id))
                     continue
 
-                filtered_posts.append(post)
                 self.post_cache.add(channel, message_id)
+                final_posts.append(post)
 
-            logger.info(f"🧾 '{self.category}': {len(filtered_posts)} нових, {len(skipped_posts)} відфільтровано")
+            logger.info(f"🧾 '{self.category}': {len(final_posts)} нових, {len(posts) - len(final_posts)} відфільтровано")
+            logger.info(f"✅ Нових постів для '{self.category}': {len(final_posts)}")
+            logger.info(f"🧹 Всього відфільтровано {len(posts) - len(final_posts)} постів у '{self.category}'")
 
-            logger.info(f"✅ Нових постів для '{self.category}': {len(filtered_posts)}")
-            logger.info(f"🧹 Всього відфільтровано {len(skipped_posts)} постів у '{self.category}'")
-            if skipped_posts:
-                for skipped in skipped_posts:
-                    if skipped["reason"] == "short":
-                        logger.info(f"   ⛔ {skipped['channel']}/{skipped['id']} — короткий ({skipped['length']} симв.)")
-                    elif skipped["reason"] == "cached":
-                        logger.info(f"   ♻️ {skipped['channel']}/{skipped['id']} — вже в кеші")
+            for ch, msg_id, length in too_short_posts:
+                logger.info(f"   ⛔ {ch}/{msg_id} — короткий ({length} симв.)")
+            for ch, msg_id, length in too_long_posts:
+                logger.info(f"   ⛔ {ch}/{msg_id} — занадто довгий ({length} симв.)")
+            for ch, msg_id in cached_posts:
+                logger.info(f"   ♻️ {ch}/{msg_id} — вже в кеші")
 
-            if len(filtered_posts) > MAX_POSTS_PER_REQUEST:
-                logger.warning(f"✂️ Зрізано {len(filtered_posts) - MAX_POSTS_PER_REQUEST} постів через ліміт prompt")
-                filtered_posts = filtered_posts[:MAX_POSTS_PER_REQUEST]
-
-            if filtered_posts:
-                await self.llm_queue.put({
-                    "category": self.category,
-                    "posts": filtered_posts,
-                    "emoji": self.emoji
-                })
+            # 4. Передача кожного поста в LLM
+            if final_posts:
+                for post in final_posts:
+                    await self.llm_queue.put({
+                        "category": self.category,
+                        "posts": [post],
+                        "emoji": self.emoji
+                    })
             else:
                 logger.info(f"📭 У потоці '{self.category}' немає нових постів для обробки")
 
+            # 5. Обробка відповідей LLM відбувається в llm_worker
+            # 6. Формування банера (опційно) — не реалізовано тут
+            # 7. Надсилання повідомлення в Telegram — виконується в іншому модулі
+
+        # Обробка помилок
         except Exception as e:
             logger.error(f"🔥 [{self.category}] Помилка у DigestThread: {e}")

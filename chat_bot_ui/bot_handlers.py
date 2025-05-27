@@ -1,3 +1,4 @@
+from typing import Any, Dict
 import json
 from aiogram import Router, types, F
 from aiogram.fsm.context import FSMContext
@@ -8,11 +9,13 @@ from main import run_digest_threads
 router = Router()
 
 # Функції для роботи з JSON
-def load_channel_groups():
+def load_channel_groups() -> Dict[str, list[str]]:
+    # Ignore the Any return type because json.load can't infer structured types at runtime,
+    # but we ensure it by context.
     with open(CHANNEL_GROUPS, "r", encoding="utf-8") as f:
-        return json.load(f)
+        return json.load(f)  # type: ignore[no-any-return]
 
-def save_channel_groups(data):
+def save_channel_groups(data: Dict[str, list[str]]) -> None:
     with open(CHANNEL_GROUPS, "w", encoding="utf-8") as f:
         json.dump(data, f, indent=2, ensure_ascii=False)
 
@@ -23,7 +26,7 @@ class AddChannelStates(StatesGroup):
 
 # /addchannel
 @router.message(F.text.in_({"/addchannel", "📌 Додати канал"}))
-async def cmd_addchannel(message: types.Message, state: FSMContext):
+async def cmd_addchannel(message: types.Message, state: FSMContext) -> None:
     groups = list(load_channel_groups().keys())
     keyboard = types.ReplyKeyboardMarkup(
         keyboard=[[types.KeyboardButton(text=g)] for g in groups],
@@ -35,7 +38,7 @@ async def cmd_addchannel(message: types.Message, state: FSMContext):
 
 # вибір потоку
 @router.message(AddChannelStates.choosing_group)
-async def process_group_choice(message: types.Message, state: FSMContext):
+async def process_group_choice(message: types.Message, state: FSMContext) -> None:
     group = message.text
     groups = load_channel_groups()
     if group not in groups:
@@ -47,10 +50,10 @@ async def process_group_choice(message: types.Message, state: FSMContext):
 
 # додавання каналу
 @router.message(AddChannelStates.entering_channel)
-async def process_channel_entry(message: types.Message, state: FSMContext):
+async def process_channel_entry(message: types.Message, state: FSMContext) -> None:
     data = await state.get_data()
     group = data["group"]
-    nickname = message.text.strip()
+    nickname = message.text.strip() if message.text else ""
 
     if not nickname.startswith("@"):
         await message.answer("❌ Нікнейм має починатися з @. Спробуйте ще раз.")
@@ -69,7 +72,7 @@ async def process_channel_entry(message: types.Message, state: FSMContext):
 
 # /digest — ручний запуск дайджесту
 @router.message(F.text.in_({"/digest", "🧠 Згенерувати дайджест"}))
-async def cmd_digest(message: types.Message):
+async def cmd_digest(message: types.Message) -> None:
     await message.answer("📡 Починаю формувати дайджест. Це займе кілька секунд...")
     await run_digest_threads()
     await message.answer("✅ Дайджест згенеровано за запитом.")

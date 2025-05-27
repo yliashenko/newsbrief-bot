@@ -1,5 +1,5 @@
 from config import POST_ENTRY_EMOJI
-from shared.types import TelegramPost, SummaryEntry
+from shared.custom_types import TelegramPost, SummaryEntry
 from summarizer.summarizer import summarize_text
 from shared.logger import logger
 import re
@@ -15,11 +15,11 @@ async def format_digest(category: str, posts: list[TelegramPost], emoji: str) ->
     for post in posts:
 
         logger.info(f"🔄 summarize_text start: {post['channel']}/{post['id']}")
-        summary = await summarize_text(post)
+        summary: SummaryEntry | None = await summarize_text(post)
         logger.info(f"✅ summarize_text done: {post['channel']}/{post['id']}")
         
         if summary is None:
-            summary = {"title": "", "summary": ""}
+            summary = SummaryEntry(title="", summary="")
         summaries.append(summary)
 
     result = [format_title(category, emoji)]

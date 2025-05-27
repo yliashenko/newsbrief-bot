@@ -7,7 +7,7 @@ DB_PATH = Path("cache.db")
 CACHE_LIFETIME_DAYS = 14
 _db_lock = threading.Lock()
 
-def init_db():
+def init_db() -> None:
     with _db_lock:
         conn = sqlite3.connect(DB_PATH, check_same_thread=False)
         cursor = conn.cursor()
@@ -30,7 +30,7 @@ def init_db():
 
 
 class PostCache:
-    def __init__(self):
+    def __init__(self) -> None:
         init_db()  # ініціалізація при створенні екземпляру
 
     def is_cached(self, channel: str, message_id: int) -> bool:
@@ -45,7 +45,7 @@ class PostCache:
             conn.close()
             return result is not None
 
-    def add(self, channel: str, message_id: int):
+    def add(self, channel: str, message_id: int) -> None:
         with _db_lock:
             conn = sqlite3.connect(DB_PATH, check_same_thread=False)
             cursor = conn.cursor()
@@ -57,6 +57,6 @@ class PostCache:
             conn.commit()
             conn.close()
 
-    def save(self):
+    def save(self) -> None:
         # У sqlite кеш пишеться одразу — нічого не потрібно.
         pass

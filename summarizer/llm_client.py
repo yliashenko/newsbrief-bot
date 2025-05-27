@@ -9,7 +9,7 @@ HEADERS = {
     "Content-Type": "application/json"
 }
 
-async def call_llm(prompt: str, model: str = DEFAULT_MODEL, attempt=1) -> str:
+async def call_llm(prompt: str, model: str = DEFAULT_MODEL, attempt: int = 1) -> str:
     payload = {
         "model": model,
         "messages": [
@@ -37,7 +37,7 @@ async def call_llm(prompt: str, model: str = DEFAULT_MODEL, attempt=1) -> str:
                 data = await response.json()
 
         logger.info(f"✅ Groq відповідь ({model}) за {duration:.2f}с")
-        return data["choices"][0]["message"]["content"]
+        return str(data["choices"][0]["message"]["content"])
 
     except asyncio.TimeoutError:
         logger.warning(f"⏳ [Спроба {attempt}] Таймаут очікування відповіді від LLM.")
