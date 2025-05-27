@@ -41,3 +41,6 @@ async def get_channel_title(channel: str) -> str:
     except Exception:
         title = channel
     return title
+async def close_client() -> None:
+    if client.is_connected():
+        await client.disconnect()

@@ -21,15 +21,14 @@ async def call_llm(prompt: str, model: str = DEFAULT_MODEL, attempt: int = 1) ->
     try:
         await asyncio.sleep(1.5)
         start_time = time.time()
-        async with aiohttp.ClientSession() as session:
-            response = await asyncio.wait_for(session.post(
+        timeout = aiohttp.ClientTimeout(total=15)
+        async with aiohttp.ClientSession(timeout=timeout) as session:
+            async with session.post(
                 "https://api.groq.com/openai/v1/chat/completions",
                 headers=HEADERS,
-                json=payload,
-                timeout=aiohttp.ClientTimeout(total=15)
-            ), timeout=30)
+                json=payload
+            ) as response:
 
-            async with response:
                 duration = time.time() - start_time
                 if response.status != 200:
                     error_text = await response.text()

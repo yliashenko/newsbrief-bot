@@ -54,7 +54,7 @@ def format_entry(index: int, title: str, summary: str, url: str) -> str:
     )
 
 def format_footer() -> str:
-    return "\n<i>Згенеровано ботом ✨</i>"
+    return "\n<i>[згенеровано ботом]</i>"
 
 def clean_summary_text(text: str) -> str:
     text = re.sub(r'(?<!\*)\*\*(.*?)\*\*(?!\*)', r'<b>\1</b>', text)  # **bold** → <b>
