@@ -7,9 +7,10 @@ from shared.custom_types import TelegramPost, Summary
 import asyncio
 
 async def summarize_post(post: TelegramPost, model: str = DEFAULT_MODEL) -> Summary:
-    text = sanitize_post_text(post.get("text", ""))
-    if not text:
+    sanitized = sanitize_post_text(post.get("text", ""))
+    if not sanitized:
         return {"title": "❌", "summary": "Пост порожній або некоректний."}
+    text = sanitized
     prompt = build_prompt([text])
     response = await call_llm(prompt, model=model)
     if not response.strip():
