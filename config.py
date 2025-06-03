@@ -15,12 +15,12 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 DEFAULT_MODEL = "llama3-70b-8192"
 FALLBACK_MODEL = "mixtral-8x22b"
 MAX_RETRIES = 3
-MAX_NEW_POSTS_PER_CHANNEL = 20
+MAX_NEW_POSTS_PER_CHANNEL = 5
 
 MAX_POSTS_PER_REQUEST = 10
 
-MIN_POST_LENGTH = 150
-MAX_POST_LENGTH = 1000
+MIN_POST_LENGTH = 100
+MAX_POST_LENGTH = 3500
 
 SYSTEM_PROMPT = (
     "Ти — бот, що формує щоденні дайджести з Telegram-постів українською мовою. "
