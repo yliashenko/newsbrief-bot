@@ -47,7 +47,9 @@ class DigestThread:
 
             logger.info(f"🧾 '{self.category}': {len(final_posts)} нових, {len(posts) - len(final_posts)} відфільтровано")
             logger.info(f"✅ Нових постів для '{self.category}': {len(final_posts)}")
-            logger.info(f"🧹 Всього відфільтровано {len(posts) - len(final_posts)} постів у '{self.category}'")
+            logger.info(
+                f"🧹 Всього відфільтровано {len(posts) - len(final_posts)} постів у '{self.category}'"
+            )
 
             for ch, msg_id, length in too_short_posts:
                 logger.info(f"   ⛔ {ch}/{msg_id} — короткий ({length} симв.)")
