@@ -6,7 +6,8 @@ from shared.logger import logger
 from bot.formatter import format_digest
 from bot.poster import send_html_message
 from bot.poster import send_digest_banner
-from bot.telegram_client import client
+from bot.telegram_client import client, close_client
+from bot.bot_instance import bot
 from bot.cache import init_db, PostCache
 from digest.digest_thread import DigestThread
 
@@ -54,6 +55,9 @@ async def main() -> None:
     worker_task.cancel()
 
     post_cache.save()
+
+    await close_client()
+    await bot.session.close()
 
 if __name__ == "__main__":
     init_db()
