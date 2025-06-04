@@ -23,6 +23,9 @@ MAX_POSTS_PER_REQUEST = 10
 MIN_POST_LENGTH = 100
 MAX_POST_LENGTH = 3500
 
+# Telegram message hard limit
+TELEGRAM_MESSAGE_LIMIT = 4096
+
 SYSTEM_PROMPT = (
     "Ти — бот, що формує щоденні дайджести з Telegram-постів українською мовою. "
     "Твоє завдання — стиснути пост, зберігаючи ключову суть і настрій, у формат:\n"

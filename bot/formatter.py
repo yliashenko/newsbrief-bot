@@ -1,4 +1,4 @@
-from config import POST_ENTRY_EMOJI
+from config import POST_ENTRY_EMOJI, TELEGRAM_MESSAGE_LIMIT
 from shared.custom_types import TelegramPost, SummaryEntry
 from summarizer.summarizer import summarize_text
 from shared.logger import logger
@@ -34,7 +34,7 @@ async def format_digest(category: str, posts: list[TelegramPost], emoji: str) ->
         else:
             entry_block = format_entry(i, title, summary_text, url)
         block_len = len(entry_block)
-        if total_length + block_len > 4096:
+        if total_length + block_len > TELEGRAM_MESSAGE_LIMIT:
             logger.warning(f"✂️ Дайджест '{category}' досяг ліміту символів. Зупинка на {i} постах.")
             break
         result.append(entry_block)
