@@ -1,7 +1,12 @@
 from typing import Any
 from asyncio import Queue
 from digest.fetcher import fetch_posts_for_channels 
-from config import GROUP_EMOJIS, MIN_POST_LENGTH, MAX_POST_LENGTH
+from config import (
+    GROUP_EMOJIS,
+    MIN_POST_LENGTH,
+    MAX_POST_LENGTH,
+    MAX_POSTS_PER_CATEGORY,
+)
 from shared.logger import logger
 
 
@@ -48,6 +53,17 @@ class DigestThread:
                 logger.info(f"   ⛔ {ch}/{msg_id} — короткий ({length} симв.)")
             for ch, msg_id, length in too_long_posts:
                 logger.info(f"   ⛔ {ch}/{msg_id} — занадто довгий ({length} симв.)")
+
+            if len(final_posts) > MAX_POSTS_PER_CATEGORY:
+                dropped = final_posts[MAX_POSTS_PER_CATEGORY:]
+                final_posts = final_posts[:MAX_POSTS_PER_CATEGORY]
+                logger.info(
+                    f"🔻 Ліміт {MAX_POSTS_PER_CATEGORY} постів у '{self.category}'. Відкинуто {len(dropped)}"
+                )
+                for post in dropped:
+                    logger.info(
+                        f"   ↪ {post['channel']}/{post['id']} — понад ліміт"
+                    )
 
             # 4. Передача всіх постів в LLM одним повідомленням
             if final_posts:
