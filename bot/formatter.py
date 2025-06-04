@@ -2,6 +2,7 @@ from config import POST_ENTRY_EMOJI, TELEGRAM_MESSAGE_LIMIT
 from shared.custom_types import TelegramPost, SummaryEntry
 from summarizer.summarizer import summarize_text
 from shared.logger import logger
+import asyncio
 import re
 
 async def format_digest(category: str, posts: list[TelegramPost], emoji: str) -> str:
@@ -11,16 +12,17 @@ async def format_digest(category: str, posts: list[TelegramPost], emoji: str) ->
 
     logger.info(f"🌀 Починається обробка {len(posts)} постів у категорії {category}")
 
-    summaries: list[SummaryEntry] = []
-    for post in posts:
-
+    async def process_post(post: TelegramPost) -> SummaryEntry:
         logger.info(f"🔄 summarize_text start: {post['channel']}/{post['id']}")
         summary: SummaryEntry | None = await summarize_text(post)
         logger.info(f"✅ summarize_text done: {post['channel']}/{post['id']}")
-        
         if summary is None:
             summary = SummaryEntry(title="", summary="")
-        summaries.append(summary)
+        return summary
+
+    summaries: list[SummaryEntry] = await asyncio.gather(
+        *(process_post(post) for post in posts)
+    )
 
     result = [format_title(category, emoji)]
     total_length = len(result[0])
