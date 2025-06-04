@@ -5,7 +5,6 @@ from config import STREAM_IMAGES
 from .bot_instance import bot
 from config import CHAT_ID, MAX_RETRIES
 from shared.logger import logger
-from loguru import logger
 import asyncio
 
 async def send_html_message(html: str) -> None:
