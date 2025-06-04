@@ -7,7 +7,6 @@ import requests  # type: ignore[import-untyped]
 from config import CHAT_ID, BOT_TOKEN, MAX_RETRIES
 from shared.logger import logger
 from time import sleep
-from loguru import logger
 
 async def send_html_message(html: str) -> None:
     for attempt in range(1, MAX_RETRIES + 1):
