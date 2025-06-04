@@ -13,7 +13,8 @@ GROQ_API_KEY = os.getenv("GROQ_API_KEY")
 
 # === Settings ===
 DEFAULT_MODEL = "llama3-70b-8192"
-FALLBACK_MODEL = "mixtral-8x22b"
+FALLBACK_MODEL = "mixtral-8x7b-32768"
+RATE_LIMIT_INTERVAL = 0.7  # seconds between LLM requests
 MAX_RETRIES = 3
 MAX_NEW_POSTS_PER_CHANNEL = 5
 
@@ -38,7 +39,7 @@ SYSTEM_PROMPT = (
 GROUP_EMOJIS = {
     "ai": "🤖",
     "media": "🔍",
-    "blog": "📑",
+    "blogs": "📑",
     "crypto": "📈",
     "politics": "📑",
 }
@@ -51,7 +52,7 @@ CHANNEL_GROUPS = Path(__file__).parent / "channel_groups.json"
 STREAM_IMAGES = {
     "ai": "assets/banners/ai.jpg",
     "media": "assets/banners/media.jpg",
-    "blog": "assets/banners/blog.jpg",
+    "blogs": "assets/banners/blog.jpg",
     "crypto": "assets/banners/crypto.jpg",
     "politics": "assets/banners/politics.jpg",
 }

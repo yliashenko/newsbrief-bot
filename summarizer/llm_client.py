@@ -1,8 +1,18 @@
 import aiohttp
 import asyncio
 import time
-from config import GROQ_API_KEY, DEFAULT_MODEL, FALLBACK_MODEL, MAX_RETRIES, SYSTEM_PROMPT
+from config import (
+    GROQ_API_KEY,
+    DEFAULT_MODEL,
+    FALLBACK_MODEL,
+    MAX_RETRIES,
+    SYSTEM_PROMPT,
+    RATE_LIMIT_INTERVAL,
+)
 from shared.logger import logger
+
+rate_limit_lock = asyncio.Lock()
+_last_request_time = 0.0
 
 HEADERS = {
     "Authorization": f"Bearer {GROQ_API_KEY}",
@@ -19,6 +29,13 @@ async def call_llm(prompt: str, model: str = DEFAULT_MODEL, attempt: int = 1) ->
     }
 
     try:
+        async with rate_limit_lock:
+            global _last_request_time
+            elapsed = time.time() - _last_request_time
+            if elapsed < RATE_LIMIT_INTERVAL:
+                await asyncio.sleep(RATE_LIMIT_INTERVAL - elapsed)
+            _last_request_time = time.time()
+
         start_time = time.time()
         timeout = aiohttp.ClientTimeout(total=15)
         async with aiohttp.ClientSession(timeout=timeout) as session:
