@@ -3,15 +3,14 @@ from asyncio import Queue
 from digest.fetcher import fetch_posts_for_channels 
 from config import GROUP_EMOJIS, MIN_POST_LENGTH, MAX_POST_LENGTH
 from shared.logger import logger
-from bot.cache import PostCache  # 👈 додаємо
+
 
 class DigestThread:
-    def __init__(self, category: str, channels: list[str], llm_queue: Queue[dict[str, Any]], post_cache: PostCache) -> None:
+    def __init__(self, category: str, channels: list[str], llm_queue: Queue[dict[str, Any]]) -> None:
         self.category = category
         self.channels = channels
         self.emoji = GROUP_EMOJIS.get(category, "📝")
         self.llm_queue = llm_queue
-        self.post_cache = post_cache
 
     async def run(self) -> None:
         try:
@@ -22,7 +21,6 @@ class DigestThread:
             # Новий порядок фільтрації і логування
             too_short_posts = []
             too_long_posts = []
-            cached_posts = []
             final_posts = []
 
             # 2. Фільтрація постів за довжиною
@@ -40,12 +38,6 @@ class DigestThread:
                     too_long_posts.append((channel, message_id, length))
                     continue
 
-                # 3. Перевірка кешу
-                if self.post_cache.is_cached(channel, message_id):
-                    cached_posts.append((channel, message_id))
-                    continue
-
-                self.post_cache.add(channel, message_id)
                 final_posts.append(post)
 
             logger.info(f"🧾 '{self.category}': {len(final_posts)} нових, {len(posts) - len(final_posts)} відфільтровано")
@@ -56,8 +48,6 @@ class DigestThread:
                 logger.info(f"   ⛔ {ch}/{msg_id} — короткий ({length} симв.)")
             for ch, msg_id, length in too_long_posts:
                 logger.info(f"   ⛔ {ch}/{msg_id} — занадто довгий ({length} симв.)")
-            for ch, msg_id in cached_posts:
-                logger.info(f"   ♻️ {ch}/{msg_id} — вже в кеші")
 
             # 4. Передача всіх постів в LLM одним повідомленням
             if final_posts:
