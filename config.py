@@ -39,7 +39,7 @@ SYSTEM_PROMPT = (
 GROUP_EMOJIS = {
     "ai": "🤖",
     "media": "🔍",
-    "blog": "📑",
+    "blogs": "📑",
     "crypto": "📈",
     "politics": "📑",
 }
@@ -52,7 +52,7 @@ CHANNEL_GROUPS = Path(__file__).parent / "channel_groups.json"
 STREAM_IMAGES = {
     "ai": "assets/banners/ai.jpg",
     "media": "assets/banners/media.jpg",
-    "blog": "assets/banners/blog.jpg",
+    "blogs": "assets/banners/blog.jpg",
     "crypto": "assets/banners/crypto.jpg",
     "politics": "assets/banners/politics.jpg",
 }
