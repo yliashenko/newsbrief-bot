@@ -1,8 +1,9 @@
 from bot.telegram_client import get_channel_posts
 from shared.logger import logger
+from config import MAX_NEW_POSTS_PER_CHANNEL
 from typing import List, Any
 
-async def fetch_posts_for_channels(channels: List[str], limit: int = 20) -> List[Any]:
+async def fetch_posts_for_channels(channels: List[str], limit: int = MAX_NEW_POSTS_PER_CHANNEL) -> List[Any]:
     all_posts = []
 
     for channel in channels:
