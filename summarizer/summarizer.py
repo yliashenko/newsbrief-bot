@@ -1,4 +1,4 @@
-from config import DEFAULT_MODEL, MAX_POSTS_PER_REQUEST
+from config import DEFAULT_MODEL
 from summarizer.prompt_builder import build_prompt
 from summarizer.parser import parse_summaries
 from summarizer.llm_client import call_llm
