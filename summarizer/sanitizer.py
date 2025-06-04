@@ -9,6 +9,10 @@ def sanitize_post_text(text: str) -> str | None:
     if re.search(r"(?:\d[ -]*?){16}", text):
         return None
 
+    # Відфільтровуємо рекламні пости
+    if "#реклама" in text.lower():
+        return None
+
     text = unescape(text)                        # &amp; → &
     text = re.sub(r"<[^>]+>", "", text)          # Видалення HTML-тегів
     text = re.sub(r"http\S+", "", text)          # Видалення посилань
