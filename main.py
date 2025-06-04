@@ -8,18 +8,16 @@ from bot.poster import send_html_message
 from bot.poster import send_digest_banner
 from bot.telegram_client import client, close_client
 from bot.bot_instance import bot
-from bot.cache import init_db, PostCache
 from digest.digest_thread import DigestThread
 
 llm_queue: asyncio.Queue[dict[str, Any]] = asyncio.Queue()
-post_cache = PostCache()
 
 async def run_digest_threads() -> None:
     with open(CHANNEL_GROUPS, "r", encoding="utf-8") as f:
         groups = json.load(f)
 
     for category, channels in groups.items():
-        thread = DigestThread(category, channels, llm_queue, post_cache)
+        thread = DigestThread(category, channels, llm_queue)
         await thread.run()
 
 async def llm_worker() -> None:
@@ -54,11 +52,9 @@ async def main() -> None:
     await llm_queue.join()
     worker_task.cancel()
 
-    post_cache.save()
 
     await close_client()
     await bot.session.close()
 
 if __name__ == "__main__":
-    init_db()
     asyncio.run(main())
