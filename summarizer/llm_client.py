@@ -14,8 +14,19 @@ from shared.logger import logger
 rate_limit_lock = asyncio.Lock()
 _last_request_time = 0.0
 
+# Переконаємося що ключ очищений від зайвих символів
+_clean_api_key = GROQ_API_KEY.strip() if GROQ_API_KEY else None
+
+# Діагностика: логуємо звідки завантажується ключ
+logger.info(f"🔑 GROQ_API_KEY в llm_client: {_clean_api_key[:8]}...{_clean_api_key[-8:] if _clean_api_key else 'N/A'} (довжина: {len(_clean_api_key) if _clean_api_key else 0})")
+# Перевірка чи це правильний ключ
+if _clean_api_key and not _clean_api_key.startswith("gsk_sJXF"):
+    logger.warning(f"⚠️  УВАГА: Використовується ключ, який не відповідає очікуваному!")
+    logger.warning(f"   Очікується: gsk_sJXF...")
+    logger.warning(f"   Використовується: {_clean_api_key[:8]}...")
+
 HEADERS = {
-    "Authorization": f"Bearer {GROQ_API_KEY}",
+    "Authorization": f"Bearer {_clean_api_key}",
     "Content-Type": "application/json"
 }
 
@@ -48,6 +59,22 @@ async def call_llm(prompt: str, model: str = DEFAULT_MODEL, attempt: int = 1) ->
                 duration = time.time() - start_time
                 if response.status != 200:
                     error_text = await response.text()
+                    # Детальна обробка помилки 401 (Invalid API Key)
+                    if response.status == 401:
+                        logger.error("❌ GROQ_API_KEY невалідний!")
+                        # Діагностична інформація (без повного ключа)
+                        if _clean_api_key:
+                            logger.error(f"   Довжина ключа: {len(_clean_api_key)} символів")
+                            logger.error(f"   Починається з: {_clean_api_key[:8]}...")
+                            logger.error(f"   Закінчується на: ...{_clean_api_key[-8:]}")
+                        else:
+                            logger.error("   Ключ порожній або не завантажився!")
+                        logger.error("💡 Перевірте:")
+                        logger.error("   1. Чи правильно скопійований ключ з https://console.groq.com/keys")
+                        logger.error("   2. Чи немає зайвих пробілів на початку/кінці ключа")
+                        logger.error("   3. Чи встановлено ключ в Environment Variables на Render")
+                        logger.error("   4. Перезапустіть сервіс після зміни ключа на Render")
+                        logger.error(f"   5. Деталі помилки: {error_text}")
                     raise Exception(f"{response.status} {response.reason}: {error_text}")
                 data = await response.json()
 

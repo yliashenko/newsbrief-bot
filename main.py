@@ -6,7 +6,7 @@ from shared.logger import logger
 from bot.formatter import format_digest
 from bot.poster import send_html_message
 from bot.poster import send_digest_banner
-from bot.telegram_client import client, close_client
+from bot.telegram_client import client, close_client, start_client
 from bot.bot_instance import bot
 from digest.digest_thread import DigestThread
 
@@ -43,7 +43,7 @@ async def llm_worker() -> None:
             logger.exception(f"💥 Помилка в llm_worker: {e}")
 
 async def main() -> None:
-    await client.connect()
+    await start_client()
 
     worker_task = asyncio.create_task(llm_worker())
     digest_task = asyncio.create_task(run_digest_threads())
