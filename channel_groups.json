@@ -2,15 +2,13 @@
   "ai": [
     "@denissexy",
     "@imatrofAI",
-    "@seeallochnaya",
     "@ppprompt",
-    "@max_about_ai"
+    "@aiukraine_wetrust"
   ],
   "media": [
     "@spekamedia",
-    "@iSIGHTmedia",
+    "@theworldisnoteasy",
     "@wallstreetukr",
-    "@gruntmedia",
     "@keddr"
   ],
   "blogs": [
@@ -20,7 +18,9 @@
     "@AnatoliyAmelin"
     ],
   "politics": [
-    "@OstanniyCapitalist",
-    "@resurgammmm"
+    "@gruntmedia",
+    "@suspilnenews",
+    "@resurgammmm",
+    "@smolii_ukraine"
   ]
 }
