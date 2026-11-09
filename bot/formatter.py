@@ -3,6 +3,7 @@ from shared.custom_types import TelegramPost, SummaryEntry
 from summarizer.summarizer import summarize_text
 from shared.logger import logger
 import asyncio
+import html
 import re
 
 async def format_digest(category: str, posts: list[TelegramPost], emoji: str) -> str:
@@ -59,6 +60,8 @@ def format_footer() -> str:
     return "\n<i>[згенеровано ботом]</i>"
 
 def clean_summary_text(text: str) -> str:
+    # LLM-текст не можна парсити як HTML: один "<" змушує Telegram відхилити весь дайджест
+    text = html.escape(text, quote=False)
     text = re.sub(r'(?<!\*)\*\*(.*?)\*\*(?!\*)', r'<b>\1</b>', text)  # **bold** → <b>
     text = re.sub(r'^#+\s*', '', text, flags=re.MULTILINE)  # remove heading #
     text = re.sub(r'^-\s*', '• ', text, flags=re.MULTILINE)  # - point → • point

@@ -41,10 +41,10 @@ if not BOT_TOKEN:
 
 # === Settings ===
 # Оновлено: старі моделі більше не доступні на Groq API
-# llama-3.3-70b-versatile - найближчий аналог до llama3-70b-8192 (70B параметрів)
-DEFAULT_MODEL = "llama-3.3-70b-versatile"
-# llama-3.1-8b-instant - швидша модель для fallback (замість mixtral-8x7b-32768)
-FALLBACK_MODEL = "llama-3.1-8b-instant"
+# Заміни для llama-3.3-70b-versatile і llama-3.1-8b-instant, вимкнених 16.08.2026:
+# https://console.groq.com/docs/deprecations
+DEFAULT_MODEL = "openai/gpt-oss-120b"
+FALLBACK_MODEL = "openai/gpt-oss-20b"
 RATE_LIMIT_INTERVAL = 0.7  # seconds between LLM requests
 MAX_RETRIES = 3
 MAX_NEW_POSTS_PER_CHANNEL = 5

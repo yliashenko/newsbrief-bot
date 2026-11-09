@@ -22,8 +22,8 @@ async def run_digest_threads() -> None:
 
 async def llm_worker() -> None:
     while True:
+        task = await llm_queue.get()
         try:
-            task = await llm_queue.get()
             category = task["category"]
             posts = task["posts"]
             emoji = task["emoji"]
@@ -37,10 +37,11 @@ async def llm_worker() -> None:
                 logger.info(f"📬 Дайджест для '{category}' надіслано")
             else:
                 logger.info(f"⏭️ Категорія '{category}' не відправлена (немає контенту або перевищено ліміт)")
-
-            llm_queue.task_done()
         except Exception as e:
             logger.exception(f"💥 Помилка в llm_worker: {e}")
+        finally:
+            # Інакше llm_queue.join() чекатиме вічно, і cron зависне до таймауту
+            llm_queue.task_done()
 
 async def main() -> None:
     await start_client()
